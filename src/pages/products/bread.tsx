@@ -7,28 +7,28 @@ const products = [
     id: 'b1',
     name: 'Banana Bread',
     description: 'Moist and delicious banana bread made with ripe bananas and premium ingredients',
-    price: '₦3,500',
+    price: '₦7,000',
     image: 'https://images.unsplash.com/photo-1686431985100-a31cb343bce9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxmcmVzaGx5JTIwYmFrZWQlMjBicmVhZHxlbnwwfDB8fHwxNzM5NDk0MDc3fDA&ixlib=rb-4.0.3&q=80&w=1080'
   },
   {
     id: 'b2',
     name: 'Coconut Bread',
     description: 'Sweet and fluffy coconut bread with real coconut flakes',
-    price: '₦3,000',
+    price: '₦6,000',
     image: 'https://images.unsplash.com/photo-1566698629409-787a68fc5724?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxhcnRpc2FuJTIwYnJlYWR8ZW58MHwwfHx8MTczOTQ5NDA3OHww&ixlib=rb-4.0.3&q=80&w=1080'
   },
   {
     id: 'b3',
     name: 'Whole Wheat Bread',
     description: 'Healthy whole wheat bread perfect for sandwiches',
-    price: '₦2,500',
+    price: '₦5,000',
     image: 'https://images.unsplash.com/photo-1598373182308-3270495d2f58?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxicmVhZCUyMGxvYWZ8ZW58MHwwfHx8MTczOTQ5NDA3OXww&ixlib=rb-4.0.3&q=80&w=1080'
   },
   {
     id: 'b4',
     name: 'Milk Bread',
     description: 'Soft and fluffy milk bread, perfect for breakfast',
-    price: '₦2,000',
+    price: '₦4,000',
     image: 'https://images.unsplash.com/photo-1579697096985-41fe1430e5df?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxiYWtlcnklMjBicmVhZHxlbnwwfDB8fHwxNzM5NDk0MDc5fDA&ixlib=rb-4.0.3&q=80&w=1080'
   }
 ];

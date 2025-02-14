@@ -7,21 +7,21 @@ const products = [
     id: 'c1',
     name: 'Birthday Cake',
     description: 'Customized birthday cakes with your choice of flavors and designs',
-    price: 'Starting from ₦15,000',
+    price: 'Starting from ₦30,000',
     image: 'https://images.unsplash.com/photo-1589218909732-f304d13fbf2c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxiaXJ0aGRheSUyMGNha2V8ZW58MHwwfHx8MTczOTQ5NDA3NHww&ixlib=rb-4.0.3&q=80&w=1080'
   },
   {
     id: 'c2',
     name: 'Wedding Cake',
     description: 'Elegant multi-tiered wedding cakes with premium decorations',
-    price: 'Starting from ₦50,000',
+    price: 'Starting from ₦100,000',
     image: 'https://images.unsplash.com/photo-1604702433171-33756f3f3825?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHx3ZWRkaW5nJTIwY2FrZXxlbnwwfDB8fHwxNzM5NDk0MDc1fDA&ixlib=rb-4.0.3&q=80&w=1080'
   },
   {
     id: 'c3',
     name: 'Cupcakes',
     description: 'Delicious cupcakes in various flavors perfect for any occasion',
-    price: '₦5,000 per dozen',
+    price: '₦10,000 per dozen',
     image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxjaG9jb2xhdGUlMjBjYWtlfGVufDB8MHx8fDE3Mzk0OTQwNzV8MA&ixlib=rb-4.0.3&q=80&w=1080'
   }
 ];

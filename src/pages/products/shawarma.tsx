@@ -7,28 +7,28 @@ const products = [
     id: 'sh1',
     name: 'Classic Chicken Shawarma',
     description: 'Grilled chicken with fresh vegetables and special sauce wrapped in flat bread',
-    price: '₦2,000',
+    price: '₦4,000',
     image: 'https://images.unsplash.com/photo-1724698341025-3df06b7e490d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxjaGlja2VuJTIwc2hhd2FybWF8ZW58MHwwfHx8MTczOTQ5NDA4N3ww&ixlib=rb-4.0.3&q=80&w=1080'
   },
   {
     id: 'sh2',
     name: 'Beef Shawarma',
     description: 'Seasoned beef strips with vegetables and garlic sauce',
-    price: '₦2,500',
+    price: '₦5,000',
     image: 'https://images.unsplash.com/photo-1654579920979-8ebb4e96b755?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxiZWVmJTIwc2hhd2FybWF8ZW58MHwwfHx8MTczOTQ5NDA4OHww&ixlib=rb-4.0.3&q=80&w=1080'
   },
   {
     id: 'sh3',
     name: 'Special Shawarma',
     description: 'Double meat (chicken and beef) with extra cheese and special sauce',
-    price: '₦3,000',
+    price: '₦6,000',
     image: 'https://images.unsplash.com/photo-1662116765994-1e4200c43589?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxzaGF3YXJtYSUyMHdyYXB8ZW58MHwwfHx8MTczOTQ5NDA4OXww&ixlib=rb-4.0.3&q=80&w=1080'
   },
   {
     id: 'sh4',
     name: 'Party Pack',
     description: 'Mix of chicken and beef shawarma (10 pieces)',
-    price: '₦22,000',
+    price: '₦44,000',
     image: 'https://images.unsplash.com/photo-1715640396476-a884855dbcc7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxneXJvJTIwc2FuZHdpY2h8ZW58MHwwfHx8MTczOTQ5NDA4OXww&ixlib=rb-4.0.3&q=80&w=1080'
   }
 ];
@@ -85,9 +85,9 @@ const ShawarmaPage = () => {
         <div className="mt-12 p-6 bg-gray-50 rounded-xl">
           <h2 className="text-2xl font-semibold mb-4">Customization Options</h2>
           <ul className="list-disc list-inside text-gray-600 space-y-2">
-            <li>Extra cheese - ₦500</li>
-            <li>Extra meat - ₦1,000</li>
-            <li>Special sauce - ₦300</li>
+            <li>Extra cheese - ₦1,000</li>
+            <li>Extra meat - ₦2,000</li>
+            <li>Special sauce - ₦600</li>
           </ul>
         </div>
       </div>

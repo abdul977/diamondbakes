@@ -7,28 +7,28 @@ const products = [
     id: 'sc1',
     name: 'Classic Small Chops Pack',
     description: 'Mix of spring rolls, samosas, puff puff, and chicken wings (50 pieces)',
-    price: '₦15,000',
+    price: '₦30,000',
     image: 'https://images.unsplash.com/photo-1606525437679-037aca74a3e9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxzcHJpbmclMjByb2xsc3xlbnwwfDB8fHwxNzM5NDk0MDg0fDA&ixlib=rb-4.0.3&q=80&w=1080'
   },
   {
     id: 'sc2',
     name: 'Premium Party Pack',
     description: 'Deluxe mix including fish rolls, mini pizzas, and meatballs (100 pieces)',
-    price: '₦35,000',
+    price: '₦70,000',
     image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxzYW1vc2F8ZW58MHwwfHx8MTczOTQ5NDA4NXww&ixlib=rb-4.0.3&q=80&w=1080'
   },
   {
     id: 'sc3',
     name: 'Puff Puff Special',
     description: 'Nigerian-style soft and fluffy puff puff (50 pieces)',
-    price: '₦5,000',
+    price: '₦10,000',
     image: 'https://images.unsplash.com/photo-1665833613236-7c1d087463b1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxwdWZmJTIwcHVmZnxlbnwwfDB8fHwxNzM5NDk0MDg1fDA&ixlib=rb-4.0.3&q=80&w=1080'
   },
   {
     id: 'sc4',
     name: 'Spring Rolls Pack',
     description: 'Crispy vegetable spring rolls with sweet chili sauce (30 pieces)',
-    price: '₦10,000',
+    price: '₦20,000',
     image: 'https://images.unsplash.com/photo-1574183118053-258a7b31e784?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxmaW5nZXIlMjBmb29kfGVufDB8MHx8fDE3Mzk0OTQwODZ8MA&ixlib=rb-4.0.3&q=80&w=1080'
   }
 ];

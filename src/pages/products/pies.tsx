@@ -7,21 +7,21 @@ const products = [
     id: 'p1',
     name: 'Meat Pie',
     description: 'Classic Nigerian meat pie filled with seasoned minced meat, potatoes, and carrots',
-    price: '₦500 per piece',
+    price: '₦1,000 per piece',
     image: 'https://images.unsplash.com/photo-1545668855-b923f0176935?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxtZWF0JTIwcGllfGVufDB8MHx8fDE3Mzk0OTQwODF8MA&ixlib=rb-4.0.3&q=80&w=1080'
   },
   {
     id: 'p2',
     name: 'Chicken Pie',
     description: 'Delicious pie filled with tender chicken and vegetables',
-    price: '₦500 per piece',
+    price: '₦1,000 per piece',
     image: 'https://images.unsplash.com/photo-1601000938365-f182c5ec2f77?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxjaGlja2VuJTIwcGllfGVufDB8MHx8fDE3Mzk0OTQwODF8MA&ixlib=rb-4.0.3&q=80&w=1080'
   },
   {
     id: 'p3',
     name: 'Party Pack Pies',
     description: 'Mix of meat and chicken pies perfect for events (minimum 50 pieces)',
-    price: 'Starting from ₦25,000',
+    price: 'Starting from ₦50,000',
     image: 'https://images.unsplash.com/photo-1601000938259-9e92002320b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxuaWdlcmlhbiUyMG1lYXQlMjBwaWV8ZW58MHwwfHx8MTczOTQ5NDA4Mnww&ixlib=rb-4.0.3&q=80&w=1080'
   }
 ];

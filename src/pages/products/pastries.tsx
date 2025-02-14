@@ -7,35 +7,35 @@ const products = [
     id: 'pa1',
     name: 'Sausage Roll',
     description: 'Classic sausage roll with seasoned minced meat filling',
-    price: '₦400 per piece',
+    price: '₦800 per piece',
     image: 'https://images.unsplash.com/photo-1619445832874-8b153f60ae78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxzYXVzYWdlJTIwcm9sbHxlbnwwfDB8fHwxNzM5NDk0MDkwfDA&ixlib=rb-4.0.3&q=80&w=1080'
   },
   {
     id: 'pa2',
     name: 'Doughnuts',
     description: 'Soft and fluffy doughnuts with various toppings (6 pieces)',
-    price: '₦2,500',
+    price: '₦5,000',
     image: 'https://images.unsplash.com/photo-1587652758160-6fee93aee8a1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxmcmVzaCUyMGNyb2lzc2FudHN8ZW58MHwwfHx8MTczOTQ5NDA5MXww&ixlib=rb-4.0.3&q=80&w=1080'
   },
   {
     id: 'pa3',
     name: 'Scotch Egg',
     description: 'Boiled egg wrapped in seasoned minced meat and breadcrumbs',
-    price: '₦500 per piece',
+    price: '₦1,000 per piece',
     image: 'https://images.unsplash.com/photo-1599639668273-01b1f435b56d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxkb3VnaG51dHMlMjBkaXNwbGF5fGVufDB8MHx8fDE3Mzk0OTQwOTJ8MA&ixlib=rb-4.0.3&q=80&w=1080'
   },
   {
     id: 'pa4',
     name: 'Croissants',
     description: 'Buttery, flaky croissants (4 pieces)',
-    price: '₦3,000',
+    price: '₦6,000',
     image: 'https://images.unsplash.com/photo-1576748092413-ee713ea2f178?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxzY290Y2glMjBlZ2d8ZW58MHwwfHx8MTczOTQ5NDA5Mnww&ixlib=rb-4.0.3&q=80&w=1080'
   },
   {
     id: 'pa5',
     name: 'Chicken Roll',
     description: 'Puff pastry filled with seasoned shredded chicken',
-    price: '₦600 per piece',
+    price: '₦1,200 per piece',
     image: 'https://images.unsplash.com/photo-1504113888839-1c8eb50233d3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2NzY2NTJ8MHwxfHNlYXJjaHwxfHxwYXN0cnklMjBkaXNwbGF5fGVufDB8MHx8fDE3Mzk0OTQwOTN8MA&ixlib=rb-4.0.3&q=80&w=1080'
   }
 ];
