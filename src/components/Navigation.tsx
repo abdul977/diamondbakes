@@ -8,6 +8,7 @@ const Navigation = () => {
   const menuItems = [
     { name: 'Home', href: '/' },
     { name: 'Menu', href: '/menu' },
+    { name: 'Blog', href: '/blog' },
     { name: 'About', href: '/about' },
     { name: 'Gallery', href: '/gallery' },
     { name: 'FAQ', href: '/faq' },

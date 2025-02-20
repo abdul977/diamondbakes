@@ -3,7 +3,8 @@ export interface MenuItem {
   name: string;
   description: string;
   price: string;
-  category: string;
+  categoryId?: string;
+  categoryName?: string;
   image: string;
 }
 
@@ -20,4 +21,23 @@ export interface CategoryCard {
   name: string;
   image: string;
   description: string;
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  author: string;
+  date: string;
+  image: string;
+  tags: string[];
+}
+
+export interface BlogComment {
+  id: string;
+  postId: string;
+  author: string;
+  content: string;
+  date: string;
 }
