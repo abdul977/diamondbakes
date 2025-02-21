@@ -1,21 +1,73 @@
-import axios from 'axios';
+import apiClient from '../utils/apiClient';
 import { BlogPost } from '../types';
 
-const API_URL = 'http://localhost:5001/api';
-
 export const blogService = {
-  getAllPosts: async (): Promise<BlogPost[]> => {
-    const response = await axios.get(`${API_URL}/blog-posts`);
-    return response.data;
+  // Test blog routes
+  async testRoute(): Promise<{ message: string }> {
+    try {
+      console.log('Testing blog routes...');
+      const response = await apiClient.get('/blog/test');
+      console.log('Test response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error testing blog routes:', error);
+      throw error;
+    }
   },
 
-  getPostById: async (id: string): Promise<BlogPost> => {
-    const response = await axios.get(`${API_URL}/blog-posts/${id}`);
-    return response.data;
+  // Get all blog posts
+  async getAllPosts(): Promise<BlogPost[]> {
+    try {
+      console.log('Fetching blog posts...');
+      const response = await apiClient.get('/blog/posts');
+      console.log('Blog posts response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching blog posts:', error);
+      throw error;
+    }
   },
 
-  createPost: async (post: Omit<BlogPost, 'id'>): Promise<BlogPost> => {
-    const response = await axios.post(`${API_URL}/blog-posts`, post);
-    return response.data;
+  // Get single blog post
+  async getPostById(id: string): Promise<BlogPost> {
+    try {
+      const response = await apiClient.get(`/blog/posts/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching blog post ${id}:`, error);
+      throw error;
+    }
+  },
+
+  // Create new blog post
+  async createPost(post: Omit<BlogPost, 'id' | 'date'>): Promise<BlogPost> {
+    try {
+      const response = await apiClient.post('/blog/posts', post);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating blog post:', error);
+      throw error;
+    }
+  },
+
+  // Update blog post
+  async updatePost(id: string, post: Partial<BlogPost>): Promise<BlogPost> {
+    try {
+      const response = await apiClient.put(`/blog/posts/${id}`, post);
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating blog post ${id}:`, error);
+      throw error;
+    }
+  },
+
+  // Delete blog post
+  async deletePost(id: string): Promise<void> {
+    try {
+      await apiClient.delete(`/blog/posts/${id}`);
+    } catch (error) {
+      console.error(`Error deleting blog post ${id}:`, error);
+      throw error;
+    }
   }
 };

@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import menuRoutes from './routes/menuRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import settingsRoutes from './routes/settingsRoutes.js';
+import blogRoutes from './routes/blogRoutes.js';
 import { errorHandler } from './middleware/authMiddleware.js';
 
 // Load env vars
@@ -21,7 +23,7 @@ app.use(cookieParser());
 app.use(cors({
   origin: 'http://localhost:5173',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
   credentials: true
 }));
 
@@ -49,6 +51,16 @@ app.use('/api/auth', (req, res, next) => {
   console.log('Auth route hit:', req.method, req.path);
   next();
 }, authRoutes);
+
+app.use('/api/settings', (req, res, next) => {
+  console.log('Settings route hit:', req.method, req.path);
+  next();
+}, settingsRoutes);
+
+app.use('/api/blog', (req, res, next) => {
+  console.log('Blog route hit:', req.method, req.path);
+  next();
+}, blogRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -90,6 +102,12 @@ async function startServer() {
       console.log(`- GET    http://localhost:${PORT}/api/menu/products`);
       console.log(`- POST   http://localhost:${PORT}/api/menu/categories`);
       console.log(`- POST   http://localhost:${PORT}/api/menu/products`);
+      console.log('\nBlog Routes:');
+      console.log(`- GET    http://localhost:${PORT}/api/blog/posts`);
+      console.log(`- GET    http://localhost:${PORT}/api/blog/posts/:id`);
+      console.log(`- POST   http://localhost:${PORT}/api/blog/posts`);
+      console.log(`- PUT    http://localhost:${PORT}/api/blog/posts/:id`);
+      console.log(`- DELETE http://localhost:${PORT}/api/blog/posts/:id`);
     });
   } catch (error) {
     console.error('Error starting server:', error);

@@ -1,29 +1,100 @@
-import React from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTheme } from '../contexts/ThemeContext';
 
 const Hero = () => {
+  const { settings, loading, version } = useTheme();
+  
+  useEffect(() => {
+    console.log('Hero rerendering:', {
+      version,
+      settingsPresent: !!settings,
+      hero: settings?.hero,
+      theme: settings?.theme
+    });
+  }, [settings, version]);
+
+  // Use useMemo to recreate theme and hero objects when settings or version changes
+  const { theme, hero } = useMemo(() => {
+    const defaultTheme = {
+      backgroundColor: '#F9FAFB',
+      fontFamily: 'sans',
+      primaryColor: '#FCD34D',
+      secondaryColor: '#111827'
+    };
+
+    const defaultHero = {
+      title: 'Diamond Elite Bites\nA Heavenly Bites',
+      description: 'Turning your fantasy into reality with celebration cakes, budget cakes, banana & coconut bread, and all types of cakes. We also offer food trays and pastries ready to travel!',
+      imageUrl: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80'
+    };
+
+    if (!settings) {
+      console.log('Using default theme and hero (no settings)');
+      return { theme: defaultTheme, hero: defaultHero };
+    }
+
+    const result = {
+      theme: settings.theme || defaultTheme,
+      hero: settings.hero || defaultHero
+    };
+    
+    console.log('Computed theme and hero:', result);
+    return result;
+  }, [settings, version]); // Include version in dependencies
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div 
+      className="min-h-screen" 
+      style={{ 
+        backgroundColor: theme.backgroundColor,
+        fontFamily: theme.fontFamily === 'serif' ? 'serif' : 
+                   theme.fontFamily === 'mono' ? 'monospace' : 
+                   'sans-serif'
+      }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className="text-gray-900">
-            <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6">
-              Diamond Elite Bites <br/> A Heavenly Bites
+          <div style={{ color: theme.secondaryColor }}>
+            <h1 
+              className="text-4xl md:text-6xl font-bold mb-6" 
+              style={{ 
+                whiteSpace: 'pre-line',
+                color: theme.secondaryColor
+              }}
+            >
+              {hero.title}
             </h1>
-            <p className="text-lg md:text-xl text-gray-600 mb-8">
-              Turning your fantasy into reality with celebration cakes, budget cakes, banana & coconut bread, and all types of cakes. We also offer food trays and pastries ready to travel!
+            <p className="text-lg md:text-xl mb-8" style={{ opacity: 0.8 }}>
+              {hero.description}
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 to="/menu"
-                className="bg-yellow-400 text-gray-900 px-8 py-3 rounded-lg hover:bg-yellow-500 transition-colors flex items-center justify-center font-medium"
+                className="px-8 py-3 rounded-lg transition-colors flex items-center justify-center font-medium"
+                style={{ 
+                  backgroundColor: theme.primaryColor,
+                  color: theme.secondaryColor
+                }}
               >
                 Shop Now <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
               <Link
                 to="/menu"
-                className="border-2 border-gray-900 text-gray-900 px-8 py-3 rounded-lg hover:bg-gray-900 hover:text-white transition-colors font-medium text-center"
+                className="px-8 py-3 rounded-lg transition-colors font-medium text-center"
+                style={{ 
+                  border: `2px solid ${theme.secondaryColor}`,
+                  color: theme.secondaryColor
+                }}
               >
                 Our Menu
               </Link>
@@ -31,8 +102,8 @@ const Hero = () => {
           </div>
           <div className="relative h-96 lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl">
             <img
-              src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80"
-              alt="Fresh bread and pastries"
+              src={hero.imageUrl}
+              alt="Hero image"
               className="w-full h-full object-cover"
             />
           </div>

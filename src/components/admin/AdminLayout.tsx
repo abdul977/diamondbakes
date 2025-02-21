@@ -7,7 +7,6 @@ import {
   Home,
   ShoppingBag,
   FileText,
-  Tag,
   Settings,
   LogOut,
   ChevronDown
@@ -140,20 +139,7 @@ const AdminLayout: React.FC = () => {
             >
               Posts
             </Link>
-            <Link
-              to="/admin/blog/categories"
-              className="block p-2 text-sm text-gray-600 hover:text-purple-600"
-            >
-              Categories
-            </Link>
           </NavItem>
-
-          <NavItem
-            to="/admin/tags"
-            icon={<Tag size={20} />}
-            label="Tags"
-            isActive={isActive('/admin/tags')}
-          />
 
           <NavItem
             to="/admin/settings"
