@@ -219,6 +219,21 @@ router.get('/categories/:name/products', async (req, res) => {
   }
 });
 
+// @desc    Get all products
+// @route   GET /api/menu/products
+// @access  Public
+router.get('/products', async (req, res) => {
+  try {
+    console.log('Fetching all products');
+    const products = await Product.find({});
+    console.log(`Found ${products.length} products`);
+    res.json(products);
+  } catch (error) {
+    console.error('Error fetching all products:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // @desc    Get single product by ID
 // @route   GET /api/menu/products/:id
 // @access  Public

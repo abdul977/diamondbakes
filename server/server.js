@@ -8,6 +8,8 @@ import authRoutes from './routes/authRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import blogRoutes from './routes/blogRoutes.js';
 import galleryRoutes from './routes/galleryRoutes.js';
+import testimonialRoutes from './routes/testimonialRoutes.js';
+import aboutRoutes from './routes/aboutRoutes.js';
 import { errorHandler } from './middleware/authMiddleware.js';
 
 // Load env vars
@@ -68,6 +70,16 @@ app.use('/api/gallery', (req, res, next) => {
   next();
 }, galleryRoutes);
 
+app.use('/api/testimonials', (req, res, next) => {
+  console.log('Testimonials route hit:', req.method, req.path);
+  next();
+}, testimonialRoutes);
+
+app.use('/api/about', (req, res, next) => {
+  console.log('About route hit:', req.method, req.path);
+  next();
+}, aboutRoutes);
+
 // 404 handler
 app.use((req, res) => {
   console.log('404 Not Found:', req.method, req.url);
@@ -120,6 +132,14 @@ async function startServer() {
       console.log(`- POST   http://localhost:${PORT}/api/gallery`);
       console.log(`- PUT    http://localhost:${PORT}/api/gallery/:id`);
       console.log(`- DELETE http://localhost:${PORT}/api/gallery/:id`);
+      console.log('\nTestimonial Routes:');
+      console.log(`- GET    http://localhost:${PORT}/api/testimonials`);
+      console.log(`- POST   http://localhost:${PORT}/api/testimonials`);
+      console.log(`- PUT    http://localhost:${PORT}/api/testimonials/:id`);
+      console.log(`- DELETE http://localhost:${PORT}/api/testimonials/:id`);
+      console.log('\nAbout Routes:');
+      console.log(`- GET    http://localhost:${PORT}/api/about`);
+      console.log(`- PUT    http://localhost:${PORT}/api/about`);
     });
   } catch (error) {
     console.error('Error starting server:', error);

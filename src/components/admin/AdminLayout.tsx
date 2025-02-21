@@ -10,7 +10,9 @@ import {
   Settings,
   LogOut,
   ChevronDown,
-  Image
+  Image,
+  MessageSquare,
+  Info
 } from 'lucide-react';
 
 interface NavItemProps {
@@ -147,6 +149,20 @@ const AdminLayout: React.FC = () => {
             icon={<Image size={20} />}
             label="Gallery"
             isActive={isActive('/admin/gallery')}
+          />
+
+          <NavItem
+            to="/admin/testimonials"
+            icon={<MessageSquare size={20} />}
+            label="Testimonials"
+            isActive={isActive('/admin/testimonials')}
+          />
+
+          <NavItem
+            to="/admin/about"
+            icon={<Info size={20} />}
+            label="About Us"
+            isActive={isActive('/admin/about')}
           />
 
           <NavItem

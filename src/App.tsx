@@ -11,6 +11,8 @@ import Products from './pages/admin/menu/Products';
 import BlogPosts from './pages/admin/blog/Posts';
 import Settings from './pages/admin/Settings';
 import AdminGallery from './pages/admin/gallery/Gallery';
+import AdminTestimonials from './pages/admin/testimonials/Testimonials';
+import AdminAbout from './pages/admin/about/About';
 
 import Navigation from './components/Navigation';
 import Hero from './components/Hero';
@@ -122,6 +124,8 @@ function App() {
               <Route path="blog" element={<Navigate to="/admin/blog/posts" replace />} />
               <Route path="blog/posts" element={<BlogPosts />} />
               <Route path="gallery" element={<AdminGallery />} />
+              <Route path="testimonials" element={<AdminTestimonials />} />
+              <Route path="about" element={<AdminAbout />} />
               <Route path="settings" element={<Settings />} />
             </Route>
 

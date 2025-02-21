@@ -1,42 +1,34 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Star } from 'lucide-react';
-
-const testimonials = [
-  {
-    id: 1,
-    name: 'Oluwaseun Adebayo',
-    role: 'Event Planner',
-    image: 'https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?auto=format&fit=crop&q=80', /* Nigerian businessman */
-    content: 'The small chops from Diamond Elite Bites are always the highlight at my events. Their service is reliable and the quality is consistently excellent.',
-    rating: 5
-  },
-  {
-    id: 2,
-    name: 'Chidinma Okonkwo',
-    role: 'Business Owner',
-    image: 'https://images.unsplash.com/photo-1613053341085-db794820ce43?auto=format&fit=crop&q=80', /* Nigerian businesswoman */
-    content: 'I order their meat pies regularly for my office meetings. They\'re always fresh, well-seasoned, and delivered on time. Highly recommended!',
-    rating: 5
-  },
-  {
-    id: 3,
-    name: 'Aisha Ibrahim',
-    role: 'Wedding Planner',
-    image: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?auto=format&fit=crop&q=80', /* Nigerian woman portrait */
-    content: 'Their wedding cakes are absolutely beautiful! The attention to detail and taste is outstanding. My clients are always impressed.',
-    rating: 5
-  },
-  {
-    id: 4,
-    name: 'Babajide Ogunleye',
-    role: 'Restaurant Owner',
-    image: 'https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?auto=format&fit=crop&q=80', /* Nigerian man portrait */
-    content: 'The quality of their bread is exceptional. I\'ve been ordering from them for my restaurant for over a year now. Great consistency!',
-    rating: 5
-  }
-];
+import { getTestimonials, type Testimonial } from '../services/testimonialService';
 
 const Testimonials = () => {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadTestimonials = async () => {
+      try {
+        const data = await getTestimonials();
+        setTestimonials(data);
+      } catch (err) {
+        setError('Failed to load testimonials');
+        console.error('Error loading testimonials:', err);
+      }
+    };
+
+    loadTestimonials();
+  }, []);
+
+  if (error) {
+    return (
+      <section className="py-24 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-red-500">{error}</p>
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="py-24 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -50,7 +42,7 @@ const Testimonials = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {testimonials.map((testimonial) => (
             <div
-              key={testimonial.id}
+            key={testimonial._id}
               className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300"
             >
               <div className="flex items-center mb-4">
