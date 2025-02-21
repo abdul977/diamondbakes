@@ -1,10 +1,26 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  optimizeDeps: {
-    exclude: ['lucide-react'],
-  },
-});
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          components: [
+            './src/components/BlogCard.tsx',
+            './src/components/Categories.tsx',
+            './src/components/Footer.tsx',
+            './src/components/Hero.tsx',
+            './src/components/Navigation.tsx',
+            './src/components/Newsletter.tsx',
+            './src/components/Testimonials.tsx'
+          ]
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
+  }
+})
