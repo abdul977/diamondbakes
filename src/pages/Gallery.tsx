@@ -1,40 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { fetchImagesForCategory } from '../utils/fetchImages';
+import { galleryService } from '../services/galleryService';
 
 const Gallery = () => {
-  const [images, setImages] = useState<Record<string, string[]>>({
-    cakes: [],
-    bread: [],
-    pies: [],
-    smallChops: [],
-    shawarma: [],
-    pastries: [],
-    gallery: []
-  });
-
+  const [items, setItems] = useState<Record<string, typeof galleryService.getAllItems extends () => Promise<infer T> ? T : never>>({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('all');
 
   useEffect(() => {
-    const loadImages = async () => {
+    const loadGalleryItems = async () => {
       try {
-        const results: Record<string, string[]> = {};
-        const categories = ['cakes', 'bread', 'pies', 'smallChops', 'shawarma', 'pastries', 'gallery'];
+        const allItems = await galleryService.getAllItems();
+        const categorizedItems = allItems.reduce((acc, item) => {
+          const category = item.category || 'other';
+          if (!acc[category]) {
+            acc[category] = [];
+          }
+          acc[category].push(item);
+          return acc;
+        }, {} as Record<string, typeof allItems>);
         
-        for (const category of categories) {
-          const categoryImages = await fetchImagesForCategory(category as any);
-          results[category] = categoryImages;
-        }
-        
-        setImages(results);
+        setItems(categorizedItems);
       } catch (error) {
-        console.error('Error loading images:', error);
+        console.error('Error loading gallery items:', error);
+        setError('Failed to load gallery items');
       } finally {
         setLoading(false);
       }
     };
 
-    loadImages();
+    loadGalleryItems();
   }, []);
 
   const tabs = [
@@ -47,11 +42,11 @@ const Gallery = () => {
     { id: 'pastries', label: 'Pastries' }
   ];
 
-  const getFilteredImages = () => {
+  const getFilteredItems = () => {
     if (activeTab === 'all') {
-      return Object.values(images).flat();
+      return Object.values(items).flat();
     }
-    return images[activeTab] || [];
+    return items[activeTab] || [];
   };
 
   if (loading) {
@@ -94,16 +89,26 @@ const Gallery = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {getFilteredImages().map((image, index) => (
+          {error ? (
+            <div className="col-span-full text-center text-red-600">{error}</div>
+          ) : getFilteredItems().map((item) => (
             <div 
-              key={index}
+              key={item.id}
               className="aspect-w-4 aspect-h-3 rounded-xl overflow-hidden shadow-lg"
             >
               <img
-                src={image}
-                alt={`Gallery image ${index + 1}`}
+                src={item.image}
+                alt={item.title}
                 className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                  <h3 className="text-lg font-semibold">{item.title}</h3>
+                  {item.description && (
+                    <p className="text-sm text-gray-200">{item.description}</p>
+                  )}
+                </div>
+              </div>
             </div>
           ))}
         </div>

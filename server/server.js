@@ -7,6 +7,7 @@ import menuRoutes from './routes/menuRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import blogRoutes from './routes/blogRoutes.js';
+import galleryRoutes from './routes/galleryRoutes.js';
 import { errorHandler } from './middleware/authMiddleware.js';
 
 // Load env vars
@@ -62,6 +63,11 @@ app.use('/api/blog', (req, res, next) => {
   next();
 }, blogRoutes);
 
+app.use('/api/gallery', (req, res, next) => {
+  console.log('Gallery route hit:', req.method, req.path);
+  next();
+}, galleryRoutes);
+
 // 404 handler
 app.use((req, res) => {
   console.log('404 Not Found:', req.method, req.url);
@@ -108,6 +114,12 @@ async function startServer() {
       console.log(`- POST   http://localhost:${PORT}/api/blog/posts`);
       console.log(`- PUT    http://localhost:${PORT}/api/blog/posts/:id`);
       console.log(`- DELETE http://localhost:${PORT}/api/blog/posts/:id`);
+      console.log('\nGallery Routes:');
+      console.log(`- GET    http://localhost:${PORT}/api/gallery`);
+      console.log(`- GET    http://localhost:${PORT}/api/gallery/:id`);
+      console.log(`- POST   http://localhost:${PORT}/api/gallery`);
+      console.log(`- PUT    http://localhost:${PORT}/api/gallery/:id`);
+      console.log(`- DELETE http://localhost:${PORT}/api/gallery/:id`);
     });
   } catch (error) {
     console.error('Error starting server:', error);
