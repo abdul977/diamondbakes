@@ -9,7 +9,8 @@ import {
   FileText,
   Settings,
   LogOut,
-  ChevronDown
+  ChevronDown,
+  Image
 } from 'lucide-react';
 
 interface NavItemProps {
@@ -140,6 +141,13 @@ const AdminLayout: React.FC = () => {
               Posts
             </Link>
           </NavItem>
+
+          <NavItem
+            to="/admin/gallery"
+            icon={<Image size={20} />}
+            label="Gallery"
+            isActive={isActive('/admin/gallery')}
+          />
 
           <NavItem
             to="/admin/settings"

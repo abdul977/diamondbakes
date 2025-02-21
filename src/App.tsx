@@ -10,6 +10,7 @@ import Categories from './pages/admin/menu/Categories';
 import Products from './pages/admin/menu/Products';
 import BlogPosts from './pages/admin/blog/Posts';
 import Settings from './pages/admin/Settings';
+import AdminGallery from './pages/admin/gallery/Gallery';
 
 import Navigation from './components/Navigation';
 import Hero from './components/Hero';
@@ -27,13 +28,7 @@ import FAQ from './pages/FAQ';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 
-// Product Pages
-import CakesPage from './pages/products/cakes';
-import BreadPage from './pages/products/bread';
-import PiesPage from './pages/products/pies';
-import SmallChopsPage from './pages/products/small-chops';
-import ShawarmaPage from './pages/products/shawarma';
-import PastriesPage from './pages/products/pastries';
+import ProductsPage from './pages/Products';
 
 const HomePage = () => (
   <>
@@ -126,6 +121,7 @@ function App() {
               <Route path="menu/products" element={<Products />} />
               <Route path="blog" element={<Navigate to="/admin/blog/posts" replace />} />
               <Route path="blog/posts" element={<BlogPosts />} />
+              <Route path="gallery" element={<AdminGallery />} />
               <Route path="settings" element={<Settings />} />
             </Route>
 
@@ -139,12 +135,7 @@ function App() {
               <Route path="faq" element={<FAQ />} />
               <Route path="blog" element={<Blog />} />
               <Route path="blog/:id" element={<BlogPost />} />
-              <Route path="products/cakes" element={<CakesPage />} />
-              <Route path="products/bread-varieties" element={<BreadPage />} />
-              <Route path="products/meat-and-chicken-pies" element={<PiesPage />} />
-              <Route path="products/small-chops" element={<SmallChopsPage />} />
-              <Route path="products/shawarma" element={<ShawarmaPage />} />
-              <Route path="products/other-pastries" element={<PastriesPage />} />
+              <Route path="menu/:categoryName" element={<ProductsPage />} />
             </Route>
           </Routes>
         </Router>

@@ -1,14 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { menuService } from '../services/menuService';
-
-interface Category {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  link: string;
-}
+import { menuService, Category } from '../services/menuService';
 
 const Menu = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -60,9 +52,9 @@ const Menu = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {categories.map((category) => (
-              <Link
+              <Link 
                 key={category.id}
-                to={category.link}
+                to={`/menu/${encodeURIComponent(category.name)}`}
                 className="group bg-gray-50 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300"
               >
                 <div className="relative h-64">

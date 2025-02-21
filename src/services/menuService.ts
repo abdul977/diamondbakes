@@ -1,12 +1,11 @@
 import apiClient from '../utils/apiClient';
 import { MenuItem } from '../types';
 
-interface Category {
+export interface Category {
   id: string;
   name: string;
   description: string;
   image: string;
-  link: string;
 }
 
 export const menuService = {
@@ -104,11 +103,8 @@ export const menuService = {
   async getProductsByCategory(category: string): Promise<MenuItem[]> {
     try {
       console.log('Fetching products for category:', category);
-      const response = await apiClient.get('/menu/products', {
-        params: { category }
-      });
+      const response = await apiClient.get(`/menu/categories/${encodeURIComponent(category)}/products`);
       console.log('Category products response:', response.data);
-      // Return the array directly since server doesn't wrap it
       return response.data;
     } catch (error) {
       console.error(`Error fetching products for category ${category}:`, error);

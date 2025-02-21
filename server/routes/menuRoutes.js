@@ -73,7 +73,6 @@ router.post('/categories', protect, authorize('admin', 'super_admin'), async (re
     if (!req.body.name) missingFields.push('name');
     if (!req.body.description) missingFields.push('description');
     if (!req.body.image) missingFields.push('image');
-    if (!req.body.link) missingFields.push('link');
 
     if (missingFields.length > 0) {
       return res.status(400).json({ 
@@ -132,7 +131,6 @@ router.put('/categories/:id', protect, authorize('admin', 'super_admin'), async 
     if (!updateData.name) missingFields.push('name');
     if (!updateData.description) missingFields.push('description');
     if (!updateData.image) missingFields.push('image');
-    if (!updateData.link) missingFields.push('link');
 
     if (missingFields.length > 0) {
       return res.status(400).json({ 
@@ -195,22 +193,24 @@ router.delete('/categories/:id', protect, authorize('admin', 'super_admin'), asy
   }
 });
 
-// @desc    Get all products (with optional category filter)
-// @route   GET /api/menu/products
+// @desc    Get products by category name
+// @route   GET /api/menu/categories/:name/products
 // @access  Public
-router.get('/products', async (req, res) => {
+router.get('/categories/:name/products', async (req, res) => {
   try {
-    const { category } = req.query;
-    console.log('Requested category:', category);
-    
-    let query = {};
-    if (category) {
-      query.category = category;
+    console.log('Fetching products by category name:', req.params.name);
+    const categoryName = req.params.name;
+
+    // First verify the category exists
+    const category = await Category.findOne({ name: categoryName });
+    if (!category) {
+      console.log('Category not found:', categoryName);
+      return res.status(404).json({ message: 'Category not found' });
     }
-    
-    console.log('MongoDB query:', JSON.stringify(query));
-    const products = await Product.find(query);
-    console.log(`Found ${products.length} products for query:`, query);
+
+    // Find all products in this category
+    const products = await Product.find({ categoryName: categoryName });
+    console.log(`Found ${products.length} products for category:`, categoryName);
     
     res.json(products);
   } catch (error) {
@@ -262,11 +262,22 @@ router.post('/products', protect, authorize('admin', 'super_admin'), async (req,
       });
     }
 
+    // Find category by name to get ID
+    const category = await Category.findOne({ name: req.body.category });
+    if (!category) {
+      return res.status(400).json({ message: 'Invalid category' });
+    }
+
     // Generate unique product ID based on category
     const productId = await generateProductId(req.body.category);
 
     const productData = {
-      ...req.body,
+      name: req.body.name,
+      description: req.body.description,
+      price: req.body.price,
+      image: req.body.image,
+      categoryId: category.id,
+      categoryName: category.name,
       id: productId
     };
 
@@ -323,9 +334,23 @@ router.put('/products/:id', protect, authorize('admin', 'super_admin'), async (r
       });
     }
 
+    // If category is being updated, get the new category ID
+    let categoryUpdate = {};
+    if (updateData.category) {
+      const category = await Category.findOne({ name: updateData.category });
+      if (!category) {
+        return res.status(400).json({ message: 'Invalid category' });
+      }
+      categoryUpdate = {
+        categoryId: category.id,
+        categoryName: category.name
+      };
+      delete updateData.category;
+    }
+
     const product = await Product.findOneAndUpdate(
       { id: req.params.id },
-      updateData,
+      { ...updateData, ...categoryUpdate },
       { new: true, runValidators: true }
     );
 
