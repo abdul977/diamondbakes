@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server/server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "server/server.js"
+    }
+  ],
+  "env": {
+    "MONGODB_URI": "mongodb+srv://abdul977:salis977@cluster0.s6mmj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+    "JWT_SECRET": "your-super-strong-secret-key",
+    "JWT_EXPIRE": "24h",
+    "COOKIE_EXPIRE": "1",
+    "NODE_ENV": "production"
+  }
+}
