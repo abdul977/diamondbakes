@@ -37,9 +37,25 @@ app.use(cors({
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Set-Cookie'],
   credentials: true
 }));
+
+// Configure cookie settings
+app.use((req, res, next) => {
+  res.cookie = res.cookie.bind(res);
+  const oldCookie = res.cookie;
+  res.cookie = function (name, value, options = {}) {
+    return oldCookie.call(this, name, value, {
+      ...options,
+      sameSite: 'None',
+      secure: true,
+      domain: req.hostname.includes('vercel.app') ? '.vercel.app' : undefined
+    });
+  };
+  next();
+});
 
 // Debug middleware for all requests
 app.use((req, res, next) => {

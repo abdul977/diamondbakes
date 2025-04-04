@@ -85,7 +85,9 @@ router.post('/login', async (req, res) => {
     const cookieOptions = {
       expires: new Date(Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production'
+      secure: true,
+      sameSite: 'None',
+      path: '/'
     };
 
     res
@@ -132,7 +134,12 @@ router.get('/me', protect, async (req, res) => {
 // @access  Private
 router.post('/logout', protect, (req, res) => {
   res
-    .clearCookie('token')
+    .clearCookie('token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'None',
+      path: '/'
+    })
     .status(200)
     .json({
       success: true,
