@@ -95,17 +95,24 @@ mongoose.set('strictQuery', false);
 async function startServer() {
   try {
     console.log('Attempting to connect to MongoDB...');
+    console.log('MongoDB URI:', process.env.MONGODB_URI);
+    
+    if (!process.env.MONGODB_URI) {
+      throw new Error('MONGODB_URI is not defined in the environment variables');
+    }
     
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGODB_URI, { 
-      dbName: 'diamondbakes'
+      dbName: 'diamondbakes',
+      retryWrites: true,
+      w: 'majority'
     });
 
     console.log('Connected to MongoDB');
     console.log('Database Name:', mongoose.connection.name);
     
     // Start the Express server
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
       console.log('\nAPI endpoints:');
       console.log('Auth Routes:');
@@ -140,6 +147,18 @@ async function startServer() {
       console.log('\nAbout Routes:');
       console.log(`- GET    http://localhost:${PORT}/api/about`);
       console.log(`- PUT    http://localhost:${PORT}/api/about`);
+    });
+
+    // Graceful shutdown
+    process.on('SIGTERM', () => {
+      console.log('SIGTERM signal received: closing HTTP server');
+      server.close(() => {
+        console.log('HTTP server closed');
+        mongoose.connection.close(false, () => {
+          console.log('MongoDB connection closed');
+          process.exit(0);
+        });
+      });
     });
   } catch (error) {
     console.error('Error starting server:', error);
