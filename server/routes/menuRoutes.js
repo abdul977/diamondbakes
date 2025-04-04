@@ -263,17 +263,32 @@ router.post('/products', protect, authorize('admin', 'super_admin'), async (req,
       }
     });
     
+    // Log incoming request details
+    console.log('Product creation request:', {
+      body: req.body,
+      user: {
+        id: req.user?._id,
+        role: req.user?.role
+      }
+    });
+
     // Validate required fields
     const missingFields = [];
     if (!req.body.name) missingFields.push('name');
     if (!req.body.description) missingFields.push('description');
     if (!req.body.price) missingFields.push('price');
-    if (!req.body.category) missingFields.push('category');
+    if (!req.body.categoryId) missingFields.push('categoryId');
+    if (!req.body.categoryName) missingFields.push('categoryName');
     if (!req.body.image) missingFields.push('image');
 
     if (missingFields.length > 0) {
+      console.error('Product creation validation error:', {
+        missingFields,
+        requestBody: req.body
+      });
       return res.status(400).json({ 
-        message: `Missing required fields: ${missingFields.join(', ')}` 
+        message: `Missing required fields: ${missingFields.join(', ')}`,
+        missingFields: missingFields
       });
     }
 

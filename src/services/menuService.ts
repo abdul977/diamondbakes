@@ -115,13 +115,19 @@ export const menuService = {
   // Add new product
   async addProduct(product: Omit<MenuItem, 'id'>): Promise<MenuItem> {
     try {
+      console.log('Adding product with data:', product);
       const response = await apiClient.post(
         '/menu/products',
         product
       );
       return response.data;
-    } catch (error) {
-      console.error('Error adding product:', error);
+    } catch (error: any) {
+      console.error('Error adding product:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        requestData: product
+      });
       throw error;
     }
   },

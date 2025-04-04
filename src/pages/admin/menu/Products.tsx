@@ -80,7 +80,9 @@ const Products: React.FC = () => {
         name: formData.name,
         description: formData.description,
         price: formData.price,
-        category: selectedCategory.name,
+        categoryId: selectedCategory.id,
+        categoryName: selectedCategory.name,
+        category: selectedCategory.name, // Keep this for backward compatibility
         image: formData.image
       };
 
