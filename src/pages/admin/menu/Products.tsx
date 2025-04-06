@@ -101,8 +101,9 @@ const Products: React.FC = () => {
           const formDataUpload = new FormData();
           formDataUpload.append('image', imageFile);
           
-          // Get the API URL from environment variables
-          const apiUrl = `${import.meta.env.VITE_API_URL}/upload`;
+          // Use the correct API URL for uploads
+          // The endpoint should be relative to the base API URL
+          const apiUrl = '/upload';
           
           console.log('Uploading image to:', apiUrl);
           
@@ -111,6 +112,10 @@ const Products: React.FC = () => {
           const cookies = document.cookie.split(';');
           const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
           const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+          
+          if (!token) {
+            throw new Error('Authentication token not found. Please log in again.');
+          }
           
           const uploadResponse = await fetch(apiUrl, {
             method: 'POST',
@@ -124,7 +129,17 @@ const Products: React.FC = () => {
           if (!uploadResponse.ok) {
             const errorData = await uploadResponse.json().catch(() => ({}));
             console.error('Upload response error:', uploadResponse.status, errorData);
-            throw new Error(`Failed to upload image: ${errorData.error || uploadResponse.statusText}`);
+            
+            // Provide more specific error messages based on status code
+            if (uploadResponse.status === 401) {
+              throw new Error('Authentication failed. Please log in again.');
+            } else if (uploadResponse.status === 403) {
+              throw new Error('You do not have permission to upload images. Please contact an administrator.');
+            } else if (uploadResponse.status === 413) {
+              throw new Error('Image file is too large. Please use a smaller image (max 5MB).');
+            } else {
+              throw new Error(`Failed to upload image: ${errorData.error || uploadResponse.statusText}`);
+            }
           }
           
           const uploadResult = await uploadResponse.json();
