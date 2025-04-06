@@ -107,13 +107,18 @@ const Products: React.FC = () => {
           console.log('Uploading image to:', apiUrl);
           
           // Upload the image with authentication
-          const token = localStorage.getItem('token');
+          // Get token from cookie instead of localStorage
+          const cookies = document.cookie.split(';');
+          const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
+          const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+          
           const uploadResponse = await fetch(apiUrl, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`
             },
             body: formDataUpload,
+            credentials: 'include' // Include cookies in the request
           });
           
           if (!uploadResponse.ok) {
