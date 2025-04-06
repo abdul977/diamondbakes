@@ -101,16 +101,18 @@ const Products: React.FC = () => {
           const formDataUpload = new FormData();
           formDataUpload.append('image', imageFile);
           
-          // Get the correct API URL
-          const apiUrl = import.meta.env.VITE_API_URL 
-            ? `${import.meta.env.VITE_API_URL.replace('/api', '')}/api/upload` 
-            : '/api/upload';
+          // Get the API URL from environment variables
+          const apiUrl = `${import.meta.env.VITE_API_URL}/upload`;
           
           console.log('Uploading image to:', apiUrl);
           
-          // Upload the image
+          // Upload the image with authentication
+          const token = localStorage.getItem('token');
           const uploadResponse = await fetch(apiUrl, {
             method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
             body: formDataUpload,
           });
           

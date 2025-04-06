@@ -11,6 +11,9 @@ import galleryRoutes from './routes/galleryRoutes.js';
 import testimonialRoutes from './routes/testimonialRoutes.js';
 import aboutRoutes from './routes/aboutRoutes.js';
 import { errorHandler } from './middleware/authMiddleware.js';
+import uploadRoutes from './routes/uploadRoutes.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Load env vars
 dotenv.config({ path: './.env' });
@@ -119,6 +122,9 @@ app.use(errorHandler);
 // Configure mongoose
 mongoose.set('strictQuery', false);
 
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 async function startServer() {
   try {
     console.log('Attempting to connect to MongoDB...');
@@ -206,3 +212,8 @@ process.on('unhandledRejection', (err) => {
   // Close server & exit process
   server.close(() => process.exit(1));
 });
+
+app.use('/api/upload', (req, res, next) => {
+  console.log('Upload route hit:', req.method, req.path);
+  next();
+}, uploadRoutes);
