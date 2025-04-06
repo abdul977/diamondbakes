@@ -14,6 +14,7 @@ import { errorHandler } from './middleware/authMiddleware.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 // Load env vars
 dotenv.config({ path: './.env' });
