@@ -41,10 +41,13 @@ app.use(cors({
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Set-Cookie'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Content-Length'],
+  exposedHeaders: ['Set-Cookie', 'Access-Control-Allow-Origin'],
   credentials: true
 }));
+
+// Enable CORS preflight for all routes
+app.options('*', cors());
 
 // Configure cookie settings
 app.use((req, res, next) => {
@@ -110,6 +113,11 @@ app.use('/api/about', (req, res, next) => {
   console.log('About route hit:', req.method, req.path);
   next();
 }, aboutRoutes);
+
+app.use('/api/upload', (req, res, next) => {
+  console.log('Upload route hit:', req.method, req.path);
+  next();
+}, uploadRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -221,7 +229,4 @@ process.on('unhandledRejection', (err) => {
   server.close(() => process.exit(1));
 });
 
-app.use('/api/upload', (req, res, next) => {
-  console.log('Upload route hit:', req.method, req.path);
-  next();
-}, uploadRoutes);
+// 404 handler
