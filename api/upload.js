@@ -15,11 +15,27 @@ export const config = {
 };
 
 export default async function handler(req, res) {
+  // Add CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
+
+  // Handle OPTIONS request for CORS preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
+    console.log('Upload endpoint hit');
+    
     // Parse the incoming form data
     const form = new formidable.IncomingForm();
     form.keepExtensions = true;
@@ -31,6 +47,7 @@ export default async function handler(req, res) {
       });
     });
 
+    console.log('Files received:', files);
     const file = files.image;
     
     if (!file) {
@@ -42,6 +59,8 @@ export default async function handler(req, res) {
     
     // Generate a unique filename
     const fileName = `${uuidv4()}-${file.originalFilename}`;
+    
+    console.log('Uploading to Supabase:', fileName);
     
     // Upload to Supabase Storage
     const { data, error } = await supabase.storage
@@ -60,12 +79,14 @@ export default async function handler(req, res) {
       .from('product-images')
       .getPublicUrl(fileName);
 
+    console.log('Upload successful, URL:', urlData.publicUrl);
+    
     return res.status(200).json({ 
       success: true, 
       imageUrl: urlData.publicUrl 
     });
   } catch (error) {
     console.error('Upload error:', error);
-    return res.status(500).json({ error: 'Failed to process image upload' });
+    return res.status(500).json({ error: 'Failed to process image upload: ' + error.message });
   }
 }

@@ -101,20 +101,31 @@ const Products: React.FC = () => {
           const formDataUpload = new FormData();
           formDataUpload.append('image', imageFile);
           
+          // Get the correct API URL
+          const apiUrl = import.meta.env.VITE_API_URL 
+            ? `${import.meta.env.VITE_API_URL.replace('/api', '')}/api/upload` 
+            : '/api/upload';
+          
+          console.log('Uploading image to:', apiUrl);
+          
           // Upload the image
-          const uploadResponse = await fetch('/api/upload', {
+          const uploadResponse = await fetch(apiUrl, {
             method: 'POST',
             body: formDataUpload,
           });
           
           if (!uploadResponse.ok) {
-            throw new Error('Failed to upload image');
+            const errorData = await uploadResponse.json().catch(() => ({}));
+            console.error('Upload response error:', uploadResponse.status, errorData);
+            throw new Error(`Failed to upload image: ${errorData.error || uploadResponse.statusText}`);
           }
           
           const uploadResult = await uploadResponse.json();
           imageUrl = uploadResult.imageUrl;
-        } catch (uploadErr: any) {
-          toast.error('Image upload failed: ' + uploadErr.message);
+          console.log('Image uploaded successfully:', imageUrl);
+        } catch (uploadErr) {
+          console.error('Image upload error:', uploadErr);
+          toast.error('Image upload failed: ' + (uploadErr instanceof Error ? uploadErr.message : 'Unknown error'));
           throw new Error('Image upload failed');
         }
       }
