@@ -122,8 +122,15 @@ app.use(errorHandler);
 // Configure mongoose
 mongoose.set('strictQuery', false);
 
+// Add this near your other middleware setup
+// Make sure the uploads directory exists
+const uploadsDir = path.join(process.cwd(), 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 // Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(uploadsDir));
 
 async function startServer() {
   try {

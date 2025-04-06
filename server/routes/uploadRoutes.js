@@ -3,7 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
-import { protect, admin } from '../middleware/authMiddleware.js';
+import { protect, authorize } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -39,8 +39,8 @@ const upload = multer({
   fileFilter: fileFilter
 });
 
-// Upload image route
-router.post('/', protect, admin, upload.single('image'), (req, res) => {
+// Upload image route - using authorize('admin') instead of admin middleware
+router.post('/', protect, authorize('admin'), upload.single('image'), (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image file provided' });
