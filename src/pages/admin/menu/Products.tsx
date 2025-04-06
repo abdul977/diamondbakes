@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Search, Filter } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Plus, Edit2, Trash2, Search, Filter, Upload } from 'lucide-react';
 import { menuService } from '../../../services/menuService';
 import { MenuItem } from '../../../types';
+import { toast } from 'react-hot-toast';
 
 interface Category {
   id: string;
@@ -24,6 +25,10 @@ const Products: React.FC = () => {
     category: '',
     image: ''
   });
+  const [uploadMode, setUploadMode] = useState<'url' | 'file'>('url');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch products and categories
   const fetchProducts = async () => {
@@ -65,6 +70,19 @@ const Products: React.FC = () => {
     product.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Handle image file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      // Create a preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+      // Clear the URL input since we're using a file
+      setFormData({ ...formData, image: '' });
+    }
+  };
+
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,6 +93,32 @@ const Products: React.FC = () => {
         throw new Error('Please select a valid category');
       }
 
+      // Handle image upload if a file is selected
+      let imageUrl = formData.image;
+      if (uploadMode === 'file' && imageFile) {
+        try {
+          // Create FormData for file upload
+          const formDataUpload = new FormData();
+          formDataUpload.append('image', imageFile);
+          
+          // Upload the image
+          const uploadResponse = await fetch('/api/upload', {
+            method: 'POST',
+            body: formDataUpload,
+          });
+          
+          if (!uploadResponse.ok) {
+            throw new Error('Failed to upload image');
+          }
+          
+          const uploadResult = await uploadResponse.json();
+          imageUrl = uploadResult.imageUrl;
+        } catch (uploadErr: any) {
+          toast.error('Image upload failed: ' + uploadErr.message);
+          throw new Error('Image upload failed');
+        }
+      }
+
       // Create product data with category name
       const productData = {
         name: formData.name,
@@ -83,15 +127,17 @@ const Products: React.FC = () => {
         categoryId: selectedCategory.id,
         categoryName: selectedCategory.name,
         category: selectedCategory.name, // Keep this for backward compatibility
-        image: formData.image
+        image: imageUrl
       };
 
       console.log('Submitting product with data:', productData);
 
       if (editingProduct) {
         await menuService.updateProduct(editingProduct.id, productData);
+        toast.success('Product updated successfully');
       } else {
         await menuService.addProduct(productData);
+        toast.success('Product added successfully');
       }
       
       await fetchProducts();
@@ -100,6 +146,7 @@ const Products: React.FC = () => {
       setError('');
     } catch (err: any) {
       setError(err.message || 'Error saving product');
+      toast.error(err.message || 'Error saving product');
     }
   };
 
@@ -108,10 +155,12 @@ const Products: React.FC = () => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
         await menuService.deleteProduct(id);
+        toast.success('Product deleted successfully');
         await fetchProducts();
         setError('');
       } catch (err: any) {
         setError(err.message || 'Error deleting product');
+        toast.error(err.message || 'Error deleting product');
       }
     }
   };
@@ -126,13 +175,12 @@ const Products: React.FC = () => {
       image: ''
     });
     setEditingProduct(null);
-  };
-
-  // Find category ID for a product's category name
-  const getCategoryIdByCategoryName = (categoryName: string | undefined) => {
-    if (!categoryName) return '';
-    const category = categories.find(c => c.name === categoryName);
-    return category ? category.id : '';
+    setUploadMode('url');
+    setImageFile(null);
+    setImagePreview('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   return (
@@ -215,6 +263,8 @@ const Products: React.FC = () => {
                         category: product.categoryId || '',
                         image: product.image
                       });
+                      setImagePreview(product.image);
+                      setUploadMode('url');
                       setShowModal(true);
                     }}
                     className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
@@ -236,7 +286,7 @@ const Products: React.FC = () => {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-md w-full p-6">
             <h2 className="text-xl font-semibold mb-4">
               {editingProduct ? 'Edit Product' : 'Add New Product'}
@@ -270,7 +320,6 @@ const Products: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
                   required
-                  placeholder="e.g., 2500"
                 />
               </div>
               <div>
@@ -289,17 +338,86 @@ const Products: React.FC = () => {
                   ))}
                 </select>
               </div>
+              
+              {/* Image Upload Section */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">Image URL</label>
-                <input
-                  type="url"
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
-                  required
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Image</label>
+                
+                {/* Toggle between URL and File upload */}
+                <div className="flex space-x-4 mb-3">
+                  <button
+                    type="button"
+                    onClick={() => setUploadMode('url')}
+                    className={`px-3 py-1 rounded ${
+                      uploadMode === 'url' 
+                        ? 'bg-purple-600 text-white' 
+                        : 'bg-gray-200 text-gray-700'
+                    }`}
+                  >
+                    Image URL
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUploadMode('file')}
+                    className={`px-3 py-1 rounded ${
+                      uploadMode === 'file' 
+                        ? 'bg-purple-600 text-white' 
+                        : 'bg-gray-200 text-gray-700'
+                    }`}
+                  >
+                    Upload File
+                  </button>
+                </div>
+                
+                {uploadMode === 'url' ? (
+                  <input
+                    type="url"
+                    value={formData.image}
+                    onChange={(e) => {
+                      setFormData({ ...formData, image: e.target.value });
+                      setImagePreview(e.target.value);
+                    }}
+                    placeholder="Enter image URL"
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+                    required={uploadMode === 'url'}
+                  />
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <label className="flex-1 flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                      <Upload className="w-5 h-5 mr-2 text-gray-500" />
+                      <span className="text-gray-500">Choose file</span>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        accept="image/*"
+                        className="hidden"
+                        required={uploadMode === 'file' && !imageFile}
+                      />
+                    </label>
+                    {imageFile && (
+                      <span className="text-sm text-gray-500 truncate max-w-[150px]">
+                        {imageFile.name}
+                      </span>
+                    )}
+                  </div>
+                )}
+                
+                {/* Image Preview */}
+                {(imagePreview || (uploadMode === 'url' && formData.image)) && (
+                  <div className="mt-3 border rounded-lg p-2">
+                    <p className="text-sm text-gray-500 mb-2">Preview:</p>
+                    <img
+                      src={imagePreview || formData.image}
+                      alt="Preview"
+                      className="h-40 object-contain mx-auto"
+                      onError={() => setImagePreview('')}
+                    />
+                  </div>
+                )}
               </div>
-              <div className="flex justify-end space-x-3">
+              
+              <div className="flex justify-end space-x-3 pt-4">
                 <button
                   type="button"
                   onClick={() => {
@@ -314,7 +432,7 @@ const Products: React.FC = () => {
                   type="submit"
                   className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
                 >
-                  {editingProduct ? 'Update' : 'Create'}
+                  {editingProduct ? 'Update Product' : 'Add Product'}
                 </button>
               </div>
             </form>
