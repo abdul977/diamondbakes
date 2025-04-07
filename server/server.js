@@ -10,6 +10,7 @@ import blogRoutes from './routes/blogRoutes.js';
 import galleryRoutes from './routes/galleryRoutes.js';
 import testimonialRoutes from './routes/testimonialRoutes.js';
 import aboutRoutes from './routes/aboutRoutes.js';
+import faqRoutes from './routes/faqRoutes.js';
 import { errorHandler } from './middleware/authMiddleware.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import path from 'path';
@@ -124,6 +125,11 @@ app.use('/api/about', (req, res, next) => {
   console.log('About route hit:', req.method, req.path);
   next();
 }, aboutRoutes);
+
+app.use('/api/faq', (req, res, next) => {
+  console.log('FAQ route hit:', req.method, req.path);
+  next();
+}, faqRoutes);
 
 app.use('/api/upload', (req, res, next) => {
   console.log('Upload route hit:', req.method, req.path);

@@ -13,6 +13,7 @@ import Settings from './pages/admin/Settings';
 import AdminGallery from './pages/admin/gallery/Gallery';
 import AdminTestimonials from './pages/admin/testimonials/Testimonials';
 import AdminAbout from './pages/admin/about/About';
+import FAQManagement from './pages/admin/faq/FAQManagement';
 
 import Navigation from './components/Navigation';
 import Hero from './components/Hero';
@@ -83,7 +84,7 @@ function App() {
     <AuthProvider>
       <ThemeProvider>
         <Router>
-          <Toaster 
+          <Toaster
             position="top-right"
             toastOptions={{
               duration: 3000,
@@ -126,6 +127,7 @@ function App() {
               <Route path="gallery" element={<AdminGallery />} />
               <Route path="testimonials" element={<AdminTestimonials />} />
               <Route path="about" element={<AdminAbout />} />
+              <Route path="faq" element={<FAQManagement />} />
               <Route path="settings" element={<Settings />} />
             </Route>
 

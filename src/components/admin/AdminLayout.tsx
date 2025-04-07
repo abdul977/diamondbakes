@@ -12,7 +12,8 @@ import {
   ChevronDown,
   Image,
   MessageSquare,
-  Info
+  Info,
+  HelpCircle
 } from 'lucide-react';
 
 interface NavItemProps {
@@ -24,13 +25,13 @@ interface NavItemProps {
   children?: React.ReactNode;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ 
-  to, 
-  icon, 
-  label, 
-  isActive, 
-  hasSubmenu, 
-  children 
+const NavItem: React.FC<NavItemProps> = ({
+  to,
+  icon,
+  label,
+  isActive,
+  hasSubmenu,
+  children
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -39,8 +40,8 @@ const NavItem: React.FC<NavItemProps> = ({
       <Link
         to={to}
         className={`flex items-center w-full p-3 rounded-lg transition-colors ${
-          isActive 
-            ? 'bg-purple-100 text-purple-900' 
+          isActive
+            ? 'bg-purple-100 text-purple-900'
             : 'text-gray-600 hover:bg-gray-100'
         }`}
         onClick={() => hasSubmenu && setIsOpen(!isOpen)}
@@ -48,9 +49,9 @@ const NavItem: React.FC<NavItemProps> = ({
         <span className="p-2">{icon}</span>
         <span className="flex-grow">{label}</span>
         {hasSubmenu && (
-          <ChevronDown 
-            className={`transform transition-transform ${isOpen ? 'rotate-180' : ''}`} 
-            size={20} 
+          <ChevronDown
+            className={`transform transition-transform ${isOpen ? 'rotate-180' : ''}`}
+            size={20}
           />
         )}
       </Link>
@@ -163,6 +164,13 @@ const AdminLayout: React.FC = () => {
             icon={<Info size={20} />}
             label="About Us"
             isActive={isActive('/admin/about')}
+          />
+
+          <NavItem
+            to="/admin/faq"
+            icon={<HelpCircle size={20} />}
+            label="FAQ Management"
+            isActive={isActive('/admin/faq')}
           />
 
           <NavItem

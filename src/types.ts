@@ -42,3 +42,20 @@ export interface BlogComment {
   content: string;
   date: string;
 }
+
+export interface FAQQuestion {
+  _id?: string;
+  question: string;
+  answer: string;
+  order: number;
+}
+
+export interface FAQCategory {
+  _id?: string;
+  id: string;
+  name: string;
+  order: number;
+  questions: FAQQuestion[];
+  createdAt?: string;
+  updatedAt?: string;
+}
