@@ -25,7 +25,7 @@ const categories: CategoryCard[] = [
   {
     id: '4',
     name: 'SMALL CHOPS',
-    image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&q=80',
+    image: 'https://i0.wp.com/www.bbcatering.com.ng/wp-content/uploads/2020/07/bb-small-chops-1.jpg?fit=570%2C464&ssl=1',
     description: 'Perfect party snacks and finger foods for your events'
   },
   {
@@ -66,8 +66,8 @@ const Categories = () => {
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-3">{category.name}</h3>
                 <p className="text-gray-600 mb-4">{category.description}</p>
-            <Link 
-              to={`/products/${category.name.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and')}`} 
+            <Link
+              to={`/products/${category.name.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and')}`}
               className="text-yellow-500 font-medium hover:text-yellow-600 inline-flex items-center"
             >
               View Menu <ArrowRight className="ml-2 h-4 w-4" />

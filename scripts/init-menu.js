@@ -29,7 +29,7 @@ const categories = [
   {
     id: '4',
     name: 'SMALL CHOPS',
-    image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&q=80',
+    image: 'https://i0.wp.com/www.bbcatering.com.ng/wp-content/uploads/2020/07/bb-small-chops-1.jpg?fit=570%2C464&ssl=1',
     description: 'Perfect party snacks and finger foods for your events',
     link: '/products/small-chops'
   },
