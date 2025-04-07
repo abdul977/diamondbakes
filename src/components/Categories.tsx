@@ -72,7 +72,7 @@ const Categories = () => {
                   <h3 className="text-xl font-semibold mb-3">{category.name}</h3>
                   <p className="text-gray-600 mb-4">{category.description}</p>
                   <Link
-                    to={category.link || `/products/${category.name.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and')}`}
+                    to={category.link || `/menu/${encodeURIComponent(category.name)}`}
                     className="text-yellow-500 font-medium hover:text-yellow-600 inline-flex items-center"
                   >
                     View Menu <ArrowRight className="ml-2 h-4 w-4" />
