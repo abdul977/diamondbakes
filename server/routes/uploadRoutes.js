@@ -4,24 +4,27 @@ import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { protect, authorize } from '../middleware/authMiddleware.js';
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+// Initialize Supabase client
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseBucket = process.env.SUPABASE_BUCKET || 'product-images';
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Supabase credentials not found in environment variables');
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const router = express.Router();
 
-// Configure storage
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadDir = path.join(process.cwd(), 'uploads');
-    // Create directory if it doesn't exist
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueFilename = `${uuidv4()}-${file.originalname}`;
-    cb(null, uniqueFilename);
-  }
-});
+// Configure temporary storage for multer
+const storage = multer.memoryStorage(); // Store files in memory instead of disk
 
 // File filter
 const fileFilter = (req, file, cb) => {
@@ -40,22 +43,45 @@ const upload = multer({
 });
 
 // Upload image route - using authorize('admin') instead of admin middleware
-router.post('/', protect, authorize('admin'), upload.single('image'), (req, res) => {
+router.post('/', protect, authorize('admin'), upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image file provided' });
     }
 
-    // Create URL for the uploaded file
-    const baseUrl = process.env.NODE_ENV === 'production'
-      ? 'https://diamondbakes-backend.onrender.com'
-      : `http://localhost:${process.env.PORT || 5001}`;
-    
-    const imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
-    
+    console.log('File received:', {
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size
+    });
+
+    // Generate a unique filename
+    const fileName = `${uuidv4()}-${req.file.originalname}`;
+
+    console.log('Uploading to Supabase:', fileName);
+
+    // Upload to Supabase Storage
+    const { data, error } = await supabase.storage
+      .from(supabaseBucket)
+      .upload(fileName, req.file.buffer, {
+        contentType: req.file.mimetype,
+      });
+
+    if (error) {
+      console.error('Supabase upload error:', error);
+      return res.status(500).json({ error: 'Failed to upload image to storage: ' + error.message });
+    }
+
+    // Get the public URL
+    const { data: urlData } = supabase.storage
+      .from(supabaseBucket)
+      .getPublicUrl(fileName);
+
+    console.log('Upload successful, URL:', urlData.publicUrl);
+
     res.status(200).json({
       success: true,
-      imageUrl: imageUrl
+      imageUrl: urlData.publicUrl
     });
   } catch (error) {
     console.error('Upload error:', error);

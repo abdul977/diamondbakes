@@ -16,6 +16,17 @@
         "mongodb+srv://abdul977:salis977@cluster0.s6mmj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
         "--read-only"
       ]
+    },
+    "supabase": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_acbc6847d87d4240d5ea6b1fe95e13113eb7ded2"
+      ]
     }
   }
 }
