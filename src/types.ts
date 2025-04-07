@@ -21,6 +21,7 @@ export interface CategoryCard {
   name: string;
   image: string;
   description: string;
+  link?: string;
 }
 
 export interface BlogPost {
