@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Pencil, Trash2, Plus } from 'lucide-react';
+import React, { useEffect, useState, useRef } from 'react';
+import { Pencil, Trash2, Plus, Upload, Star } from 'lucide-react';
 import { getTestimonials, createTestimonial, updateTestimonial, deleteTestimonial, type Testimonial, type TestimonialInput } from '../../../services/testimonialService';
-import { Star } from 'lucide-react';
+import { toast } from 'react-hot-toast';
+import { storageService } from '../../../services/storageService';
 
 const Testimonials = () => {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
@@ -14,6 +15,10 @@ const Testimonials = () => {
     content: '',
     rating: 5
   });
+  const [uploadMode, setUploadMode] = useState<'url' | 'file'>('url');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchTestimonials();
@@ -28,18 +33,57 @@ const Testimonials = () => {
     }
   };
 
+  // Handle image file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      // Create a preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+      // Clear the URL input since we're using a file
+      setFormData({ ...formData, image: '' });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Handle image upload if a file is selected
+      let imageUrl = formData.image;
+      if (uploadMode === 'file' && imageFile) {
+        try {
+          console.log('Preparing to upload testimonial image to Supabase Storage');
+
+          // Use our storageService to upload directly to Supabase
+          imageUrl = await storageService.uploadFile(imageFile);
+
+          console.log('Testimonial image uploaded successfully to Supabase:', imageUrl);
+        } catch (uploadErr) {
+          console.error('Image upload error:', uploadErr);
+          toast.error('Image upload failed: ' + (uploadErr instanceof Error ? uploadErr.message : 'Unknown error'));
+          throw new Error('Image upload failed');
+        }
+      }
+
+      // Create or update testimonial with the image URL
+      const testimonialData = {
+        ...formData,
+        image: imageUrl
+      };
+
       if (editingId) {
-        await updateTestimonial(editingId, formData);
+        await updateTestimonial(editingId, testimonialData);
+        toast.success('Testimonial updated successfully');
       } else {
-        await createTestimonial(formData);
+        await createTestimonial(testimonialData);
+        toast.success('Testimonial created successfully');
       }
       resetForm();
       fetchTestimonials();
     } catch (error) {
       console.error('Error saving testimonial:', error);
+      toast.error('Error saving testimonial: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   };
 
@@ -53,6 +97,12 @@ const Testimonials = () => {
       content: testimonial.content,
       rating: testimonial.rating
     });
+    setUploadMode('url');
+    setImageFile(null);
+    setImagePreview('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -76,6 +126,12 @@ const Testimonials = () => {
       content: '',
       rating: 5
     });
+    setUploadMode('url');
+    setImageFile(null);
+    setImagePreview('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   return (
@@ -120,14 +176,67 @@ const Testimonials = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Image URL</label>
-              <input
-                type="url"
-                value={formData.image}
-                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                className="w-full p-2 border rounded"
-                required
-              />
+              <label className="block text-sm font-medium mb-1">Image</label>
+              <div className="flex space-x-2 mb-2">
+                <button
+                  type="button"
+                  onClick={() => setUploadMode('url')}
+                  className={`px-3 py-1 text-sm rounded-md ${uploadMode === 'url' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}
+                >
+                  URL
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setUploadMode('file')}
+                  className={`px-3 py-1 text-sm rounded-md ${uploadMode === 'file' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}
+                >
+                  Upload File
+                </button>
+              </div>
+
+              {uploadMode === 'url' ? (
+                <input
+                  type="url"
+                  value={formData.image}
+                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                  placeholder="Enter image URL"
+                  className="w-full p-2 border rounded"
+                  required={uploadMode === 'url'}
+                />
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <label className="flex-1 flex items-center justify-center px-4 py-2 border rounded cursor-pointer hover:bg-gray-50">
+                    <Upload className="w-5 h-5 mr-2 text-gray-500" />
+                    <span className="text-gray-500">Choose file</span>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      accept="image/*"
+                      className="hidden"
+                      required={uploadMode === 'file' && !imageFile}
+                    />
+                  </label>
+                  {imageFile && (
+                    <span className="text-sm text-gray-500 truncate max-w-[150px]">
+                      {imageFile.name}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Image Preview */}
+              {(imagePreview || (uploadMode === 'url' && formData.image)) && (
+                <div className="mt-3 border rounded p-2">
+                  <p className="text-sm text-gray-500 mb-2">Preview:</p>
+                  <img
+                    src={imagePreview || formData.image}
+                    alt="Preview"
+                    className="h-40 object-contain mx-auto"
+                    onError={() => setImagePreview('')}
+                  />
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Content</label>
