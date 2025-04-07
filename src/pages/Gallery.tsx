@@ -19,7 +19,7 @@ const Gallery = () => {
           acc[category].push(item);
           return acc;
         }, {} as Record<string, typeof allItems>);
-        
+
         setItems(categorizedItems);
       } catch (error) {
         console.error('Error loading gallery items:', error);
@@ -67,7 +67,7 @@ const Gallery = () => {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h1 className="text-4xl font-serif font-bold mb-6">Our Gallery</h1>
           <p className="text-gray-600 text-lg">
-            Take a look at our delicious creations. From custom cakes to freshly baked bread, 
+            Take a look at our delicious creations. From custom cakes to freshly baked bread,
             every item is crafted with care and attention to detail.
           </p>
         </div>
@@ -92,7 +92,7 @@ const Gallery = () => {
           {error ? (
             <div className="col-span-full text-center text-red-600">{error}</div>
           ) : getFilteredItems().map((item) => (
-            <div 
+            <div
               key={item.id}
               className="aspect-w-4 aspect-h-3 rounded-xl overflow-hidden shadow-lg"
             >
@@ -101,8 +101,8 @@ const Gallery = () => {
                 alt={item.title}
                 className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
-                <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent/5 opacity-0 hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute bottom-0 left-0 right-0 p-4 text-white bg-gradient-to-t from-black/40 to-transparent pt-8">
                   <h3 className="text-lg font-semibold">{item.title}</h3>
                   {item.description && (
                     <p className="text-sm text-gray-200">{item.description}</p>
