@@ -42,14 +42,26 @@ const upload = multer({
   fileFilter: fileFilter
 });
 
-// Log all requests to the upload route for debugging
+// Enhanced logging for upload route
 router.use((req, res, next) => {
   console.log('Upload route accessed:', {
     method: req.method,
     path: req.path,
     origin: req.headers.origin,
-    contentType: req.headers['content-type']
+    contentType: req.headers['content-type'],
+    cookies: req.cookies
   });
+
+  // Set CORS headers specifically for this route
+  res.header('Access-Control-Allow-Origin', 'https://diamondbakes.vercel.app');
+  res.header('Access-Control-Allow-Credentials', 'true');
+
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    return res.status(204).end();
+  }
+
   next();
 });
 
@@ -57,6 +69,10 @@ router.use((req, res, next) => {
 router.post('/', protect, authorize('admin'), upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
+      // Set CORS headers on error response
+      res.header('Access-Control-Allow-Origin', 'https://diamondbakes.vercel.app');
+      res.header('Access-Control-Allow-Credentials', 'true');
+
       return res.status(400).json({ error: 'No image file provided' });
     }
 
@@ -80,6 +96,11 @@ router.post('/', protect, authorize('admin'), upload.single('image'), async (req
 
     if (error) {
       console.error('Supabase upload error:', error);
+
+      // Set CORS headers on Supabase error response
+      res.header('Access-Control-Allow-Origin', 'https://diamondbakes.vercel.app');
+      res.header('Access-Control-Allow-Credentials', 'true');
+
       return res.status(500).json({ error: 'Failed to upload image to storage: ' + error.message });
     }
 
@@ -90,12 +111,21 @@ router.post('/', protect, authorize('admin'), upload.single('image'), async (req
 
     console.log('Upload successful, URL:', urlData.publicUrl);
 
+    // Set CORS headers again on the response
+    res.header('Access-Control-Allow-Origin', 'https://diamondbakes.vercel.app');
+    res.header('Access-Control-Allow-Credentials', 'true');
+
     res.status(200).json({
       success: true,
       imageUrl: urlData.publicUrl
     });
   } catch (error) {
     console.error('Upload error:', error);
+
+    // Set CORS headers on error response too
+    res.header('Access-Control-Allow-Origin', 'https://diamondbakes.vercel.app');
+    res.header('Access-Control-Allow-Credentials', 'true');
+
     res.status(500).json({ error: 'Failed to process image upload: ' + error.message });
   }
 });

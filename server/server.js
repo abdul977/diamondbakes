@@ -26,48 +26,39 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// CORS configuration - simplified approach
+// CORS configuration for Cloudflare and Render.com
 app.use((req, res, next) => {
-  // Get the origin from the request
-  const origin = req.headers.origin;
-  console.log('Request origin:', origin);
+  // Log all requests for debugging
+  console.log('Incoming request:', {
+    method: req.method,
+    path: req.path,
+    origin: req.headers.origin,
+    host: req.headers.host,
+    referer: req.headers.referer
+  });
 
-  // Allow specific origins
-  const allowedOrigins = ['http://localhost:5173', 'https://diamondbakes.vercel.app'];
-
-  if (origin && allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-
-  // Request methods you wish to allow
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-
-  // Request headers you wish to allow
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Authorization');
-
-  // Set to true if you need the website to include cookies in the requests
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-  // Handle preflight requests
+  // Always allow OPTIONS requests for CORS preflight
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    // Set CORS headers for preflight requests
+    res.header('Access-Control-Allow-Origin', 'https://diamondbakes.vercel.app');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Max-Age', '86400'); // 24 hours
+    return res.status(204).end();
   }
 
+  // For all other requests, set CORS headers
+  res.header('Access-Control-Allow-Origin', 'https://diamondbakes.vercel.app');
+  res.header('Access-Control-Allow-Credentials', 'true');
   next();
 });
 
-// Also keep the cors middleware for compatibility
-app.use(cors({
-  origin: function(origin, callback) {
-    const allowedOrigins = ['http://localhost:5173', 'https://diamondbakes.vercel.app'];
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
+// Disable the cors middleware to avoid conflicts
+// app.use(cors({
+//   origin: 'https://diamondbakes.vercel.app',
+//   credentials: true
+// }));
 
 // Configure cookie settings
 app.use((req, res, next) => {
