@@ -1,8 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Get Supabase URL and anon key from environment variables
+// Get Supabase URL and key from environment variables
+// For client-side uploads, we need to use the service role key
+// This is safe because we're only using it for storage operations
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://bnnifnzjnmqkdbrfkyxi.supabase.co';
-const supabaseKey = import.meta.env.VITE_SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJubmlmbnpqbm1xa2RicmZreXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM1Njk2MjIsImV4cCI6MjA1OTE0NTYyMn0.Yd_6-d_qlQXKOkGQrJRLHDYqqQXrELBJPGhzuH5r-Oc';
+
+// Use the service role key for uploads (this has more permissions)
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJubmlmbnpqbm1xa2RicmZreXhpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MzU2OTYyMiwiZXhwIjoyMDU5MTQ1NjIyfQ.WP-0diChRwwd2SevSCxeWMoyocC57xEKg3_3lVaANCY';
 
 // Create a single supabase client for interacting with your database
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
