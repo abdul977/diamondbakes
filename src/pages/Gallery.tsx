@@ -94,20 +94,20 @@ const Gallery = () => {
           ) : getFilteredItems().map((item) => (
             <div
               key={item.id}
-              className="aspect-w-4 aspect-h-3 rounded-xl overflow-hidden shadow-lg"
+              className="rounded-xl overflow-hidden shadow-lg flex flex-col"
             >
-              <img
-                src={item.image}
-                alt={item.title}
-                className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent/5 opacity-0 hover:opacity-100 transition-opacity duration-300">
-                <div className="absolute bottom-0 left-0 right-0 p-4 text-white bg-gradient-to-t from-black/40 to-transparent pt-8">
-                  <h3 className="text-lg font-semibold">{item.title}</h3>
-                  {item.description && (
-                    <p className="text-sm text-gray-200">{item.description}</p>
-                  )}
-                </div>
+              <div className="aspect-w-4 aspect-h-3 overflow-hidden">
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <div className="p-3 bg-white">
+                <h3 className="text-lg font-semibold text-gray-800">{item.title}</h3>
+                {item.description && (
+                  <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                )}
               </div>
             </div>
           ))}
