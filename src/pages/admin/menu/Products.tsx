@@ -3,6 +3,7 @@ import { Plus, Edit2, Trash2, Search, Filter, Upload } from 'lucide-react';
 import { menuService } from '../../../services/menuService';
 import { MenuItem } from '../../../types';
 import { toast } from 'react-hot-toast';
+import apiClient from '../../../utils/apiClient';
 
 interface Category {
   id: string;
@@ -101,49 +102,23 @@ const Products: React.FC = () => {
           const formDataUpload = new FormData();
           formDataUpload.append('image', imageFile);
 
-          // Use the correct API URL for uploads
-          // Get the base API URL from environment variables
-          const baseApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-          const apiUrl = `${baseApiUrl}/upload`;
+          // We'll use apiClient from our utils which already handles auth tokens
 
-          console.log('Uploading image to:', apiUrl);
+          console.log('Preparing to upload image');
 
-          // Upload the image with authentication
-          // Get token from cookie instead of localStorage
-          const cookies = document.cookie.split(';');
-          const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
-          const token = tokenCookie ? tokenCookie.split('=')[1] : null;
-
-          if (!token) {
-            throw new Error('Authentication token not found. Please log in again.');
-          }
-
-          const uploadResponse = await fetch(apiUrl, {
-            method: 'POST',
+          // Create a custom axios instance for form data
+          const formConfig = {
             headers: {
-              'Authorization': `Bearer ${token}`
-            },
-            body: formDataUpload,
-            credentials: 'include' // Include cookies in the request
-          });
-
-          if (!uploadResponse.ok) {
-            const errorData = await uploadResponse.json().catch(() => ({}));
-            console.error('Upload response error:', uploadResponse.status, errorData);
-
-            // Provide more specific error messages based on status code
-            if (uploadResponse.status === 401) {
-              throw new Error('Authentication failed. Please log in again.');
-            } else if (uploadResponse.status === 403) {
-              throw new Error('You do not have permission to upload images. Please contact an administrator.');
-            } else if (uploadResponse.status === 413) {
-              throw new Error('Image file is too large. Please use a smaller image (max 5MB).');
-            } else {
-              throw new Error(`Failed to upload image: ${errorData.error || uploadResponse.statusText}`);
+              'Content-Type': 'multipart/form-data'
             }
-          }
+          };
 
-          const uploadResult = await uploadResponse.json();
+          // Use apiClient directly which already handles auth tokens
+          const uploadResponse = await apiClient.post('/upload', formDataUpload, formConfig);
+
+          // With axios, the response is already parsed as JSON
+          // and errors will throw exceptions that we catch in the outer catch block
+          const uploadResult = uploadResponse.data;
           imageUrl = uploadResult.imageUrl;
           console.log('Image uploaded successfully:', imageUrl);
         } catch (uploadErr) {
