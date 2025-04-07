@@ -97,9 +97,7 @@ const FAQ = () => {
               </div>
             ))}
           </div>
-        )
-        </div>
-
+        )}
         <div className="mt-16 p-6 bg-yellow-50 rounded-xl text-center">
           <h2 className="text-xl font-semibold mb-4">Still have questions?</h2>
           <p className="text-gray-600 mb-6">
