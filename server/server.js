@@ -26,36 +26,48 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// CORS configuration
-const allowedOrigins = [
-  'http://localhost:5173',
-  'https://diamondbakes.vercel.app'
-];
+// CORS configuration - simplified approach
+app.use((req, res, next) => {
+  // Get the origin from the request
+  const origin = req.headers.origin;
+  console.log('Request origin:', origin);
 
-// Log CORS origins for debugging
-console.log('Allowed CORS origins:', allowedOrigins);
+  // Allow specific origins
+  const allowedOrigins = ['http://localhost:5173', 'https://diamondbakes.vercel.app'];
 
-const corsOptions = {
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+
+  // Request methods you wish to allow
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+
+  // Request headers you wish to allow
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Authorization');
+
+  // Set to true if you need the website to include cookies in the requests
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  next();
+});
+
+// Also keep the cors middleware for compatibility
+app.use(cors({
   origin: function(origin, callback) {
-    console.log('Request origin:', origin);
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+    const allowedOrigins = ['http://localhost:5173', 'https://diamondbakes.vercel.app'];
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.log('CORS blocked for origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Content-Length', 'X-Requested-With', 'Accept', 'Origin'],
-  exposedHeaders: ['Set-Cookie', 'Access-Control-Allow-Origin'],
   credentials: true
-};
-
-// Apply CORS middleware
-app.use(cors(corsOptions));
-
-// Enable CORS preflight for all routes
-app.options('*', cors(corsOptions));
+}));
 
 // Configure cookie settings
 app.use((req, res, next) => {
