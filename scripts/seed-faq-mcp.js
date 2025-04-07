@@ -5,7 +5,31 @@
 async function seedFAQWithMCP() {
   try {
     console.log('Starting to seed FAQ data using MCP...');
-    
+
+    // First, let's clear any existing FAQ data
+    const mcpEndpoint = 'https://mcp.pipedream.net/0615735e-782f-4d7c-8475-a54bf3d98dfc/mongodb';
+
+    console.log('Clearing existing FAQ data...');
+    try {
+      const deleteResponse = await fetch(mcpEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          database: 'diamondbakes',
+          collectionName: 'faqcategories',
+          filter: '{}',
+          data: '{"$delete": true}'
+        }),
+      });
+
+      console.log('Delete response:', await deleteResponse.json());
+    } catch (deleteError) {
+      console.warn('Error clearing FAQ data:', deleteError);
+      // Continue with seeding even if delete fails
+    }
+
     // Initial FAQ data
     const faqData = [
       {
@@ -125,36 +149,20 @@ async function seedFAQWithMCP() {
         updatedAt: new Date()
       }
     ];
-    
+
     // Make a request to the MCP server endpoint
-    const mcpEndpoint = 'https://mcp.pipedream.net/0615735e-782f-4d7c-8475-a54bf3d98dfc/mongodb';
-    
-    // First, let's check if the collection exists and has data
-    const checkResponse = await fetch(mcpEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        database: 'diamondbakes',
-        collectionName: 'faqcategories',
-        filter: '{}'
-      }),
-    });
-    
-    const checkResult = await checkResponse.json();
-    console.log('Check result:', checkResult);
-    
-    // If the collection exists and has data, we'll skip seeding
-    if (checkResult.ret && Array.isArray(checkResult.ret) && checkResult.ret.length > 0) {
-      console.log('FAQ data already exists. Skipping seeding.');
-      return;
-    }
-    
+
     // Insert each category one by one
     for (const category of faqData) {
       console.log(`Inserting category: ${category.name}`);
-      
+
+      // Convert the category object to a proper format for the MCP server
+      const categoryData = {
+        ...category,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
       const response = await fetch(mcpEndpoint, {
         method: 'POST',
         headers: {
@@ -163,18 +171,18 @@ async function seedFAQWithMCP() {
         body: JSON.stringify({
           database: 'diamondbakes',
           collectionName: 'faqcategories',
-          document: JSON.stringify(category)
+          document: JSON.stringify(categoryData)
         }),
       });
-      
+
       if (!response.ok) {
         throw new Error(`Failed to insert category ${category.name}: ${response.statusText}`);
       }
-      
+
       const result = await response.json();
       console.log(`Category ${category.name} inserted:`, result);
     }
-    
+
     console.log('FAQ data seeding completed successfully!');
   } catch (error) {
     console.error('Error seeding FAQ data:', error);
