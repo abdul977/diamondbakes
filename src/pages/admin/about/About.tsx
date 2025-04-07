@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Users, Clock, Award, Heart } from 'lucide-react';
+import React, { useEffect, useState, useRef } from 'react';
+import { Users, Clock, Award, Heart, Upload } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import {
   getAboutContent,
@@ -9,9 +9,11 @@ import {
   type AboutFeature,
   type AboutStoryImage
 } from '../../../services/aboutService';
+import { storageService } from '../../../services/storageService';
 
 const AdminAbout = () => {
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<AboutInput>({
     heading: '',
     introduction: '',
@@ -29,6 +31,13 @@ const AdminAbout = () => {
       content: ''
     }
   });
+
+  // Image upload state
+  const [imageUploadIndex, setImageUploadIndex] = useState<number | null>(null);
+  const [uploadMode, setUploadMode] = useState<'url' | 'file'>('url');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const iconComponents = {
     Users: <Users className="h-6 w-6 text-yellow-500" />,
@@ -83,14 +92,71 @@ const AdminAbout = () => {
     });
   };
 
+  // Handle image file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && imageUploadIndex !== null) {
+      setImageFile(file);
+      // Create a preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
+
+  // Handle image upload
+  const handleImageUpload = async () => {
+    if (imageFile && imageUploadIndex !== null) {
+      try {
+        setSaving(true);
+        console.log('Preparing to upload about image to Supabase Storage');
+
+        // Use our storageService to upload directly to Supabase
+        const imageUrl = await storageService.uploadFile(imageFile);
+
+        console.log('About image uploaded successfully to Supabase:', imageUrl);
+
+        // Update the form data with the new image URL
+        const newImages = [...formData.story.images];
+        newImages[imageUploadIndex] = {
+          ...newImages[imageUploadIndex],
+          url: imageUrl
+        };
+
+        setFormData({
+          ...formData,
+          story: { ...formData.story, images: newImages }
+        });
+
+        // Reset upload state
+        setImageUploadIndex(null);
+        setImageFile(null);
+        setImagePreview('');
+        setUploadMode('url');
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+
+        toast.success('Image uploaded successfully');
+      } catch (error) {
+        console.error('Image upload error:', error);
+        toast.error('Image upload failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      } finally {
+        setSaving(false);
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      setSaving(true);
       await updateAboutContent(formData);
       toast.success('About content updated successfully');
     } catch (error) {
       console.error('Error updating about content:', error);
       toast.error('Failed to update about content');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -208,16 +274,106 @@ const AdminAbout = () => {
           ))}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {formData.story.images.map((image, index) => (
-              <div key={index} className="space-y-2">
+              <div key={index} className="space-y-2 border p-4 rounded">
                 <label className="block text-sm font-medium">Image {index + 1}</label>
-                <input
-                  type="url"
-                  value={image.url}
-                  onChange={(e) => handleStoryImageChange(index, 'url', e.target.value)}
-                  placeholder="Image URL"
-                  className="w-full p-2 border rounded"
-                  required
-                />
+
+                <div className="flex space-x-2 mb-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUploadMode('url');
+                      setImageUploadIndex(index);
+                    }}
+                    className={`px-3 py-1 text-sm rounded-md ${imageUploadIndex === index && uploadMode === 'url' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'}`}
+                  >
+                    URL
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUploadMode('file');
+                      setImageUploadIndex(index);
+                      setImagePreview('');
+                      setImageFile(null);
+                      if (fileInputRef.current) {
+                        fileInputRef.current.value = '';
+                      }
+                    }}
+                    className={`px-3 py-1 text-sm rounded-md ${imageUploadIndex === index && uploadMode === 'file' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'}`}
+                  >
+                    Upload File
+                  </button>
+                </div>
+
+                {imageUploadIndex === index ? (
+                  uploadMode === 'url' ? (
+                    <div>
+                      <input
+                        type="url"
+                        value={image.url}
+                        onChange={(e) => handleStoryImageChange(index, 'url', e.target.value)}
+                        placeholder="Image URL"
+                        className="w-full p-2 border rounded mb-2"
+                        required
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <label className="flex-1 flex items-center justify-center px-4 py-2 border rounded cursor-pointer hover:bg-gray-50">
+                          <Upload className="w-5 h-5 mr-2 text-gray-500" />
+                          <span className="text-gray-500">Choose file</span>
+                          <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            accept="image/*"
+                            className="hidden"
+                          />
+                        </label>
+                        {imageFile && (
+                          <span className="text-sm text-gray-500 truncate max-w-[150px]">
+                            {imageFile.name}
+                          </span>
+                        )}
+                      </div>
+
+                      {imageFile && (
+                        <button
+                          type="button"
+                          onClick={handleImageUpload}
+                          disabled={saving}
+                          className="w-full py-2 px-4 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50"
+                        >
+                          {saving ? 'Uploading...' : 'Upload Image'}
+                        </button>
+                      )}
+
+                      {imagePreview && (
+                        <div className="mt-2">
+                          <p className="text-sm text-gray-500 mb-1">Preview:</p>
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="h-40 object-contain mx-auto border rounded p-1"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )
+                ) : (
+                  <div>
+                    <input
+                      type="url"
+                      value={image.url}
+                      onChange={(e) => handleStoryImageChange(index, 'url', e.target.value)}
+                      placeholder="Image URL"
+                      className="w-full p-2 border rounded mb-2"
+                      required
+                    />
+                  </div>
+                )}
+
                 <input
                   type="text"
                   value={image.alt}
@@ -226,6 +382,19 @@ const AdminAbout = () => {
                   className="w-full p-2 border rounded"
                   required
                 />
+
+                {image.url && imageUploadIndex !== index && (
+                  <div className="mt-2 border rounded p-1">
+                    <img
+                      src={image.url}
+                      alt={image.alt}
+                      className="h-40 object-contain mx-auto"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=Image+Not+Found';
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             ))}
           </div>

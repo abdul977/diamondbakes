@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Settings, settingsService } from '../../services/settingsService';
 import { useTheme } from '../../contexts/ThemeContext';
 import { toast } from 'react-hot-toast';
-import { Save } from 'lucide-react';
+import { Save, Upload } from 'lucide-react';
+import { storageService } from '../../services/storageService';
 
 const defaultTheme = {
   primaryColor: '#FCD34D',
@@ -41,12 +42,18 @@ const SettingsPage: React.FC = () => {
   const [settings, setSettings] = useState<Settings>(defaultSettings);
   const { refetchSettings } = useTheme();
 
+  // Image upload state
+  const [uploadMode, setUploadMode] = useState<'url' | 'file'>('url');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const fetchSettings = async () => {
     setLoading(true);
     try {
       const data = await settingsService.getSettings();
       console.log('Fetched settings:', data);
-      
+
       // Ensure theme and hero are present
       setSettings({
         ...data,
@@ -70,7 +77,7 @@ const SettingsPage: React.FC = () => {
     setSaving(true);
     try {
       console.log('Submitting settings update:', settings);
-      
+
       // Ensure theme and hero are included
       const updateData = {
         ...settings,
@@ -86,7 +93,7 @@ const SettingsPage: React.FC = () => {
 
       const updatedSettings = await settingsService.updateSettings(updateData);
       console.log('Settings updated successfully:', updatedSettings);
-      
+
       await refetchSettings();
       toast.success('Settings updated successfully');
     } catch (error: any) {
@@ -97,10 +104,60 @@ const SettingsPage: React.FC = () => {
     }
   };
 
+  // Handle image file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      // Create a preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
+
+  // Handle hero image upload
+  const handleHeroImageUpload = async () => {
+    if (imageFile) {
+      try {
+        setSaving(true);
+        console.log('Preparing to upload hero image to Supabase Storage');
+
+        // Use our storageService to upload directly to Supabase
+        const imageUrl = await storageService.uploadFile(imageFile);
+
+        console.log('Hero image uploaded successfully to Supabase:', imageUrl);
+
+        // Update the settings with the new image URL
+        setSettings(prev => ({
+          ...prev,
+          hero: {
+            ...prev.hero,
+            imageUrl: imageUrl
+          }
+        }));
+
+        // Reset upload state
+        setImageFile(null);
+        setImagePreview('');
+        setUploadMode('url');
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+
+        toast.success('Hero image uploaded successfully');
+      } catch (error) {
+        console.error('Image upload error:', error);
+        toast.error('Image upload failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      } finally {
+        setSaving(false);
+      }
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     console.log(`Setting change: ${name} = ${value}`);
-    
+
     if (name.startsWith('socialMedia.')) {
       const socialKey = name.split('.')[1];
       setSettings(prev => ({
@@ -238,15 +295,86 @@ const SettingsPage: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Hero Image URL</label>
-              <input
-                type="url"
-                name="hero.imageUrl"
-                value={settings.hero.imageUrl}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                required
-              />
+              <label className="block text-sm font-medium text-gray-700">Hero Image</label>
+              <div className="mt-1 flex items-center space-x-2">
+                <div className="flex-1">
+                  <div className="flex space-x-2 mb-2">
+                    <button
+                      type="button"
+                      onClick={() => setUploadMode('url')}
+                      className={`px-3 py-1 text-sm rounded-md ${uploadMode === 'url' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'}`}
+                    >
+                      URL
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setUploadMode('file')}
+                      className={`px-3 py-1 text-sm rounded-md ${uploadMode === 'file' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'}`}
+                    >
+                      Upload File
+                    </button>
+                  </div>
+
+                  {uploadMode === 'url' ? (
+                    <input
+                      type="url"
+                      name="hero.imageUrl"
+                      value={settings.hero.imageUrl}
+                      onChange={handleChange}
+                      placeholder="Enter image URL"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                      required={uploadMode === 'url'}
+                    />
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <label className="flex-1 flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50">
+                          <Upload className="w-5 h-5 mr-2 text-gray-500" />
+                          <span className="text-gray-500">Choose file</span>
+                          <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            accept="image/*"
+                            className="hidden"
+                          />
+                        </label>
+                        {imageFile && (
+                          <span className="text-sm text-gray-500 truncate max-w-[150px]">
+                            {imageFile.name}
+                          </span>
+                        )}
+                      </div>
+
+                      {imageFile && (
+                        <button
+                          type="button"
+                          onClick={handleHeroImageUpload}
+                          disabled={saving}
+                          className="w-full py-2 px-4 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50"
+                        >
+                          {saving ? 'Uploading...' : 'Upload Image'}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Image Preview */}
+              {(imagePreview || settings.hero.imageUrl) && (
+                <div className="mt-3 border rounded-md p-2">
+                  <p className="text-sm text-gray-500 mb-2">Preview:</p>
+                  <img
+                    src={imagePreview || settings.hero.imageUrl}
+                    alt="Hero Preview"
+                    className="h-40 object-contain mx-auto"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x400?text=Image+Not+Found';
+                    }}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
