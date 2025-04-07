@@ -35,7 +35,7 @@ const Products: React.FC = () => {
     try {
       // Always fetch all products
       const data = await menuService.getAllProducts();
-      
+
       // Filter products on the client side if a category is selected
       if (categoryFilter) {
         const filteredData = data.filter(product => product.categoryId === categoryFilter);
@@ -100,23 +100,24 @@ const Products: React.FC = () => {
           // Create FormData for file upload
           const formDataUpload = new FormData();
           formDataUpload.append('image', imageFile);
-          
+
           // Use the correct API URL for uploads
-          // The endpoint should be relative to the base API URL
-          const apiUrl = '/upload';
-          
+          // Get the base API URL from environment variables
+          const baseApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+          const apiUrl = `${baseApiUrl}/upload`;
+
           console.log('Uploading image to:', apiUrl);
-          
+
           // Upload the image with authentication
           // Get token from cookie instead of localStorage
           const cookies = document.cookie.split(';');
           const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
           const token = tokenCookie ? tokenCookie.split('=')[1] : null;
-          
+
           if (!token) {
             throw new Error('Authentication token not found. Please log in again.');
           }
-          
+
           const uploadResponse = await fetch(apiUrl, {
             method: 'POST',
             headers: {
@@ -125,11 +126,11 @@ const Products: React.FC = () => {
             body: formDataUpload,
             credentials: 'include' // Include cookies in the request
           });
-          
+
           if (!uploadResponse.ok) {
             const errorData = await uploadResponse.json().catch(() => ({}));
             console.error('Upload response error:', uploadResponse.status, errorData);
-            
+
             // Provide more specific error messages based on status code
             if (uploadResponse.status === 401) {
               throw new Error('Authentication failed. Please log in again.');
@@ -141,7 +142,7 @@ const Products: React.FC = () => {
               throw new Error(`Failed to upload image: ${errorData.error || uploadResponse.statusText}`);
             }
           }
-          
+
           const uploadResult = await uploadResponse.json();
           imageUrl = uploadResult.imageUrl;
           console.log('Image uploaded successfully:', imageUrl);
@@ -172,7 +173,7 @@ const Products: React.FC = () => {
         await menuService.addProduct(productData);
         toast.success('Product added successfully');
       }
-      
+
       await fetchProducts();
       setShowModal(false);
       resetForm();
@@ -371,19 +372,19 @@ const Products: React.FC = () => {
                   ))}
                 </select>
               </div>
-              
+
               {/* Image Upload Section */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Image</label>
-                
+
                 {/* Toggle between URL and File upload */}
                 <div className="flex space-x-4 mb-3">
                   <button
                     type="button"
                     onClick={() => setUploadMode('url')}
                     className={`px-3 py-1 rounded ${
-                      uploadMode === 'url' 
-                        ? 'bg-purple-600 text-white' 
+                      uploadMode === 'url'
+                        ? 'bg-purple-600 text-white'
                         : 'bg-gray-200 text-gray-700'
                     }`}
                   >
@@ -393,15 +394,15 @@ const Products: React.FC = () => {
                     type="button"
                     onClick={() => setUploadMode('file')}
                     className={`px-3 py-1 rounded ${
-                      uploadMode === 'file' 
-                        ? 'bg-purple-600 text-white' 
+                      uploadMode === 'file'
+                        ? 'bg-purple-600 text-white'
                         : 'bg-gray-200 text-gray-700'
                     }`}
                   >
                     Upload File
                   </button>
                 </div>
-                
+
                 {uploadMode === 'url' ? (
                   <input
                     type="url"
@@ -435,7 +436,7 @@ const Products: React.FC = () => {
                     )}
                   </div>
                 )}
-                
+
                 {/* Image Preview */}
                 {(imagePreview || (uploadMode === 'url' && formData.image)) && (
                   <div className="mt-3 border rounded-lg p-2">
@@ -449,7 +450,7 @@ const Products: React.FC = () => {
                   </div>
                 )}
               </div>
-              
+
               <div className="flex justify-end space-x-3 pt-4">
                 <button
                   type="button"
