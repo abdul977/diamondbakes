@@ -32,22 +32,30 @@ const allowedOrigins = [
   'https://diamondbakes.vercel.app'
 ];
 
-app.use(cors({
+// Log CORS origins for debugging
+console.log('Allowed CORS origins:', allowedOrigins);
+
+const corsOptions = {
   origin: function(origin, callback) {
+    console.log('Request origin:', origin);
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      console.log('CORS blocked for origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Content-Length'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Content-Length', 'X-Requested-With', 'Accept', 'Origin'],
   exposedHeaders: ['Set-Cookie', 'Access-Control-Allow-Origin'],
   credentials: true
-}));
+};
+
+// Apply CORS middleware
+app.use(cors(corsOptions));
 
 // Enable CORS preflight for all routes
-app.options('*', cors());
+app.options('*', cors(corsOptions));
 
 // Configure cookie settings
 app.use((req, res, next) => {
@@ -145,13 +153,13 @@ async function startServer() {
   try {
     console.log('Attempting to connect to MongoDB...');
     console.log('MongoDB URI:', process.env.MONGODB_URI);
-    
+
     if (!process.env.MONGODB_URI) {
       throw new Error('MONGODB_URI is not defined in the environment variables');
     }
-    
+
     // Connect to MongoDB
-    await mongoose.connect(process.env.MONGODB_URI, { 
+    await mongoose.connect(process.env.MONGODB_URI, {
       dbName: 'diamondbakes',
       retryWrites: true,
       w: 'majority'
@@ -159,7 +167,7 @@ async function startServer() {
 
     console.log('Connected to MongoDB');
     console.log('Database Name:', mongoose.connection.name);
-    
+
     // Start the Express server
     const server = app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);

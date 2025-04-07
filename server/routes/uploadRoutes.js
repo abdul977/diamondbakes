@@ -42,6 +42,31 @@ const upload = multer({
   fileFilter: fileFilter
 });
 
+// Add CORS headers for the upload route
+router.use((req, res, next) => {
+  // Get the origin from the request
+  const origin = req.headers.origin;
+  console.log('Upload route - Request origin:', origin);
+
+  // Allow specific origins
+  const allowedOrigins = ['http://localhost:5173', 'https://diamondbakes.vercel.app'];
+
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  next();
+});
+
 // Upload image route - using authorize('admin') instead of admin middleware
 router.post('/', protect, authorize('admin'), upload.single('image'), async (req, res) => {
   try {
