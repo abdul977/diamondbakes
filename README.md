@@ -17,6 +17,7 @@ A full-stack web application for Diamond Elite Bites bakery, built with React, N
 - **Frontend**: React, TypeScript, Vite, Tailwind CSS
 - **Backend**: Node.js, Express
 - **Database**: MongoDB
+- **Storage**: Supabase Storage for image uploads
 - **Authentication**: JWT
 
 ## Getting Started
@@ -42,8 +43,13 @@ npm install
 
 3. Create a .env file in the root directory with the following variables:
 ```env
+VITE_API_URL=http://localhost:5001/api
 MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
+
+# Supabase Configuration
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_KEY=your_supabase_anon_key
 ```
 
 4. Start the development server:

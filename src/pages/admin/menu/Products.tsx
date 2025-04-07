@@ -3,7 +3,7 @@ import { Plus, Edit2, Trash2, Search, Filter, Upload } from 'lucide-react';
 import { menuService } from '../../../services/menuService';
 import { MenuItem } from '../../../types';
 import { toast } from 'react-hot-toast';
-import apiClient from '../../../utils/apiClient';
+import { storageService } from '../../../services/storageService';
 
 interface Category {
   id: string;
@@ -98,29 +98,12 @@ const Products: React.FC = () => {
       let imageUrl = formData.image;
       if (uploadMode === 'file' && imageFile) {
         try {
-          // Create FormData for file upload
-          const formDataUpload = new FormData();
-          formDataUpload.append('image', imageFile);
+          console.log('Preparing to upload image directly to Supabase Storage');
 
-          // We'll use apiClient from our utils which already handles auth tokens
+          // Use our storageService to upload directly to Supabase
+          imageUrl = await storageService.uploadFile(imageFile);
 
-          console.log('Preparing to upload image');
-
-          // Create a custom axios instance for form data
-          const formConfig = {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          };
-
-          // Use apiClient directly which already handles auth tokens
-          const uploadResponse = await apiClient.post('/upload', formDataUpload, formConfig);
-
-          // With axios, the response is already parsed as JSON
-          // and errors will throw exceptions that we catch in the outer catch block
-          const uploadResult = uploadResponse.data;
-          imageUrl = uploadResult.imageUrl;
-          console.log('Image uploaded successfully:', imageUrl);
+          console.log('Image uploaded successfully to Supabase:', imageUrl);
         } catch (uploadErr) {
           console.error('Image upload error:', uploadErr);
           toast.error('Image upload failed: ' + (uploadErr instanceof Error ? uploadErr.message : 'Unknown error'));
